@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#6EC6F5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StoryReader">
+<title>StoryReader ⭐</title>
+
+<!-- PWA Manifest (inline) -->
+<script>
+const manifestData={name:"StoryReader",short_name:"StoryReader",description:"AI-powered reading adventure for kids!",start_url:"./",display:"standalone",background_color:"#FFFBF0",theme_color:"#6EC6F5",orientation:"portrait",icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#6EC6F5"/><text y="130" x="96" font-size="110" text-anchor="middle">⭐</text></svg>'),sizes:"192x192",type:"image/svg+xml"},{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#6EC6F5"/><text y="360" x="256" font-size="300" text-anchor="middle">⭐</text></svg>'),sizes:"512x512",type:"image/svg+xml"}]};
+const blob=new Blob([JSON.stringify(manifestData)],{type:"application/json"});
+const manifestURL=URL.createObjectURL(blob);
+document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement("link");l.rel="manifest";l.href=manifestURL;document.head.appendChild(l);});
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky:#6EC6F5;--sun:#FFD166;--grass:#06D6A0;--coral:#FF6B6B;--purple:#A78BFA;--cream:#FFFBF0;--ink:#2D2A3E;
+    --safe-top:env(safe-area-inset-top, 0px);
+    --safe-bottom:env(safe-area-inset-bottom, 0px);
+    --safe-left:env(safe-area-inset-left, 0px);
+    --safe-right:env(safe-area-inset-right, 0px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overscroll-behavior:none}
+  body{
+    font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);
+    min-height:100vh;min-height:-webkit-fill-available;
+    overflow-x:hidden;
+    padding-top:var(--safe-top);
+    padding-bottom:var(--safe-bottom);
+    padding-left:var(--safe-left);
+    padding-right:var(--safe-right);
+  }
+
+  /* ---- SKY ---- */
+  .sky{position:fixed;top:0;left:0;right:0;height:220px;background:linear-gradient(180deg,#B8E4FF 0%,#E8F6FF 100%);z-index:0;overflow:hidden;padding-top:var(--safe-top)}
+  .cloud{position:absolute;background:white;border-radius:50px;opacity:.85;animation:drift linear infinite}
+  .cloud::before,.cloud::after{content:'';position:absolute;background:white;border-radius:50%}
+  .c1{width:100px;height:34px;top:50px;animation-duration:28s}.c1::before{width:50px;height:50px;top:-25px;left:12px}.c1::after{width:38px;height:38px;top:-16px;left:42px}
+  .c2{width:70px;height:26px;top:90px;animation-duration:35s;animation-delay:-10s}.c2::before{width:36px;height:36px;top:-18px;left:9px}.c2::after{width:26px;height:26px;top:-12px;left:30px}
+  .c3{width:90px;height:30px;top:30px;animation-duration:22s;animation-delay:-5s}.c3::before{width:45px;height:45px;top:-22px;left:10px}.c3::after{width:36px;height:36px;top:-16px;left:40px}
+  @keyframes drift{from{left:-200px}to{left:110%}}
+  .sun-icon{position:absolute;top:max(20px, calc(var(--safe-top) + 10px));right:20px;width:60px;height:60px;background:var(--sun);border-radius:50%;box-shadow:0 0 0 10px rgba(255,209,102,.3),0 0 0 20px rgba(255,209,102,.1);animation:sun-pulse 3s ease-in-out infinite}
+  @keyframes sun-pulse{0%,100%{box-shadow:0 0 0 10px rgba(255,209,102,.3),0 0 0 20px rgba(255,209,102,.1)}50%{box-shadow:0 0 0 16px rgba(255,209,102,.3),0 0 0 30px rgba(255,209,102,.1)}}
+
+  /* ---- LAYOUT ---- */
+  .container{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:20px 16px 100px}
+
+  /* ---- HEADER ---- */
+  .header{text-align:center;padding-top:max(28px, calc(var(--safe-top) + 12px));margin-bottom:20px;position:relative}
+  .header h1{font-family:'Fredoka One',cursive;font-size:2.6rem;color:white;text-shadow:2px 3px 0 rgba(0,0,0,.12);letter-spacing:1px}
+  .header p{font-size:1rem;color:rgba(255,255,255,.9);font-weight:700;margin-top:4px}
+  .parent-btn{position:absolute;top:max(28px, calc(var(--safe-top) + 12px));right:0;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);border-radius:14px;padding:10px 14px;cursor:pointer;font-size:1.3rem;transition:all .2s;color:white;min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center}
+  .parent-btn:active{background:rgba(255,255,255,.5);transform:scale(.93)}
+
+  /* ---- SCREENS ---- */
+  .screen{display:none}
+  .screen.active{display:block;animation:fadeUp .35s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ---- CARDS ---- */
+  .card{background:white;border-radius:24px;padding:24px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.07),0 1px 6px rgba(0,0,0,.04);border:2.5px solid transparent;transition:border-color .3s}
+  .card.active-card{border-color:var(--sky)}
+  .card-title{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .card-title .icon{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+  .icon-blue{background:#EFF8FF}.icon-yellow{background:#FFFBEF}.icon-purple{background:#F5F0FF}.icon-green{background:#EFFFF9}.icon-orange{background:#FFF7EF}
+
+  /* ---- BUTTONS ---- */
+  .btn{font-family:'Fredoka One',cursive;font-size:1.15rem;border:none;border-radius:18px;padding:16px 28px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;letter-spacing:.4px;min-height:54px;touch-action:manipulation}
+  .btn:active{transform:scale(.95)}
+  .btn-primary{background:linear-gradient(135deg,var(--coral),#FF4F7B);color:white;box-shadow:0 5px 18px rgba(255,107,107,.4);width:100%}
+  .btn-secondary{background:linear-gradient(135deg,var(--grass),#00B896);color:white;box-shadow:0 5px 18px rgba(6,214,160,.35);width:100%;margin-top:10px}
+  .btn-purple{background:linear-gradient(135deg,var(--purple),#7C3AED);color:white;box-shadow:0 5px 18px rgba(167,139,250,.4);width:100%}
+  .btn-sky{background:linear-gradient(135deg,var(--sky),#3BA8E0);color:white;box-shadow:0 5px 18px rgba(110,198,245,.4);width:100%;margin-top:10px}
+  .btn-ghost{background:#F0F0F0;color:#888;width:100%;margin-top:10px}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+  /* ---- INSTALL BANNER ---- */
+  .install-banner{background:linear-gradient(135deg,#2D2A3E,#3D3A5E);border-radius:20px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;color:white;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+  .install-banner .ib-icon{font-size:2.2rem;flex-shrink:0}
+  .install-banner .ib-text{flex:1}
+  .install-banner .ib-title{font-family:'Fredoka One',cursive;font-size:1.1rem;margin-bottom:2px}
+  .install-banner .ib-sub{font-size:.82rem;opacity:.75;font-weight:600}
+  .install-banner .ib-btn{background:var(--sun);color:var(--ink);border:none;border-radius:12px;padding:8px 14px;font-family:'Fredoka One',cursive;font-size:.9rem;cursor:pointer;flex-shrink:0;min-height:40px}
+  .install-banner .ib-close{background:none;border:none;color:rgba(255,255,255,.5);font-size:1.2rem;cursor:pointer;padding:4px;min-width:32px;min-height:32px}
+
+  /* ---- STREAK BAR ---- */
+  .streak-bar{display:flex;gap:10px;margin-bottom:14px}
+  .streak-chip{flex:1;background:white;border-radius:18px;padding:14px 10px;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.06);border:2px solid transparent}
+  .streak-chip .chip-num{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--ink);line-height:1}
+  .streak-chip .chip-label{font-size:.72rem;font-weight:800;color:#aaa;margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+  .streak-chip.hot{border-color:var(--coral);background:linear-gradient(135deg,#FFF5F5,#FFF0F0)}
+  .streak-chip.hot .chip-num{color:var(--coral)}
+  .streak-chip.gold{border-color:var(--sun);background:linear-gradient(135deg,#FFFDF0,#FFFBE8)}
+  .streak-chip.gold .chip-num{color:#D4900A}
+
+  /* ---- BADGES ---- */
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px}
+  .badge{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 12px;border-radius:14px;border:2px solid #eee;background:#fafafa;min-width:64px}
+  .badge.earned{border-color:var(--sun);background:linear-gradient(135deg,#FFFDF0,#FFF8E0)}
+  .badge .badge-icon{font-size:1.7rem;filter:grayscale(1);opacity:.3;transition:all .3s}
+  .badge.earned .badge-icon{filter:none;opacity:1}
+  .badge .badge-name{font-size:.68rem;font-weight:800;color:#bbb;text-align:center}
+  .badge.earned .badge-name{color:#D4900A}
+
+  /* ---- HISTORY ---- */
+  .history-list{display:flex;flex-direction:column;gap:8px}
+  .history-item{background:linear-gradient(135deg,#F8F8FF,#F0F0FF);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:.92rem;font-weight:700;color:var(--ink)}
+  .history-item .h-date{font-size:.75rem;color:#aaa;font-weight:600;white-space:nowrap}
+  .history-item .h-idea{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .history-empty{color:#ccc;font-style:italic;font-weight:600;text-align:center;padding:14px 0;font-size:.95rem}
+
+  /* ---- IDEA SCREEN ---- */
+  .idea-hero{text-align:center;padding:6px 0 16px}
+  .idea-hero .big-emoji{font-size:4rem;display:block;margin-bottom:8px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .idea-hero h2{font-family:'Fredoka One',cursive;font-size:1.65rem;color:var(--ink);margin-bottom:5px}
+  .idea-hero p{font-size:.95rem;color:#666;font-weight:600;line-height:1.5}
+  .mic-big-btn{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--coral),#FF4F7B);border:none;cursor:pointer;margin:14px auto;display:block;font-size:2.5rem;box-shadow:0 7px 24px rgba(255,107,107,.45);transition:all .15s ease;touch-action:manipulation}
+  .mic-big-btn:active{transform:scale(.93)}
+  .mic-big-btn.recording{animation:mic-glow 1s ease-in-out infinite}
+  @keyframes mic-glow{0%,100%{box-shadow:0 7px 24px rgba(255,107,107,.45),0 0 0 0 rgba(255,107,107,.4)}50%{box-shadow:0 7px 24px rgba(255,107,107,.45),0 0 0 18px rgba(255,107,107,0)}}
+  .mic-hint{text-align:center;font-size:.9rem;font-weight:700;color:#bbb;margin-bottom:6px;min-height:20px}
+  .idea-heard{background:linear-gradient(135deg,#F0F8FF,#EFF8FF);border:2px solid var(--sky);border-radius:16px;padding:14px 18px;font-size:1.05rem;font-weight:700;color:var(--ink);min-height:54px;text-align:center;display:flex;align-items:center;justify-content:center;margin:12px 0}
+  .idea-heard.empty{color:#bbb;font-style:italic;font-weight:600}
+  .divider{text-align:center;color:#ccc;font-size:.82rem;font-weight:700;margin:8px 0}
+  .idea-input{width:100%;padding:14px 16px;border-radius:14px;border:2px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:var(--ink);outline:none;transition:border-color .2s;background:white;-webkit-appearance:none}
+  .idea-input:focus{border-color:var(--sky)}
+
+  /* ---- LOADING ---- */
+  .loading-screen{text-align:center;padding:36px 16px}
+  .loading-screen h2{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--ink);margin-bottom:8px}
+  .loading-idea-text{color:#888;font-weight:700;font-size:.95rem;margin-bottom:24px;font-style:italic}
+  .book-loader{font-size:4.5rem;display:block;margin:0 auto 18px;animation:book-bounce .6s ease-in-out infinite alternate}
+  @keyframes book-bounce{from{transform:translateY(0) rotate(-5deg)}to{transform:translateY(-14px) rotate(5deg)}}
+  .loading-dots{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+  .dot{width:13px;height:13px;border-radius:50%;background:var(--coral);animation:dot-pop 1.2s ease-in-out infinite}
+  .dot:nth-child(2){background:var(--sun);animation-delay:.2s}.dot:nth-child(3){background:var(--grass);animation-delay:.4s}
+  @keyframes dot-pop{0%,80%,100%{transform:scale(.7);opacity:.5}40%{transform:scale(1.2);opacity:1}}
+  .loading-msg{font-size:.95rem;color:#aaa;font-style:italic}
+
+  /* ---- READING ---- */
+  .story-box{background:linear-gradient(135deg,#FFFBF0,#FFF8E8);border:2px dashed #FFD166;border-radius:16px;padding:20px;line-height:2.1;font-size:1.15rem;font-weight:600;min-height:80px;color:var(--ink)}
+  .word{display:inline;padding:2px 2px;border-radius:5px;transition:all .2s ease}
+  .word.read{background:#DCFCE7;color:#166534}
+  .word.current{background:var(--sun);color:var(--ink);border-radius:7px;box-shadow:0 2px 6px rgba(255,209,102,.6);animation:bounce-word .35s ease}
+  @keyframes bounce-word{0%{transform:scale(1)}50%{transform:scale(1.14)}100%{transform:scale(1)}}
+  .progress-wrap{background:#F0F0F0;border-radius:20px;height:12px;margin:16px 0 5px;overflow:hidden}
+  .progress-bar{height:100%;background:linear-gradient(90deg,var(--grass),var(--sky));border-radius:20px;width:0%;transition:width .4s ease}
+  .progress-label{font-size:.82rem;font-weight:700;color:#aaa;text-align:right}
+  .mic-status{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.95rem;padding:10px 14px;border-radius:12px;margin-bottom:12px;background:#F5F5F5;color:#888;transition:all .3s}
+  .mic-status.listening{background:#FFF0F0;color:var(--coral)}
+  .mic-dot{width:11px;height:11px;border-radius:50%;background:#ccc;flex-shrink:0;transition:all .3s}
+  .mic-dot.active{background:var(--coral);animation:mic-pulse 1s ease-in-out infinite}
+  @keyframes mic-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4);opacity:.7}}
+  .heard-box{font-size:.84rem;color:#aaa;font-style:italic;min-height:20px;margin-top:6px}
+  .prize-display{background:linear-gradient(135deg,#FFF0FF,#F0F0FF);border:2px solid var(--purple);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;font-size:1rem;font-weight:800;color:#5B21B6}
+  .prize-emoji-display{font-size:1.9rem}
+
+  /* ---- PARENT SETTINGS ---- */
+  .setting-row{margin-bottom:20px}
+  .setting-label{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--ink);margin-bottom:9px;display:flex;align-items:center;gap:7px}
+  .option-group{display:flex;flex-wrap:wrap;gap:8px}
+  .option-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;padding:10px 16px;border-radius:12px;border:2px solid #e0e0e0;background:white;cursor:pointer;transition:all .15s;color:#666;min-height:44px;touch-action:manipulation}
+  .option-btn:active{transform:scale(.95)}
+  .option-btn.selected{border-color:var(--purple);background:linear-gradient(135deg,#F5F0FF,#EDE8FF);color:#5B21B6}
+  .setting-input{width:100%;padding:14px 16px;border-radius:14px;border:2px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:var(--ink);outline:none;transition:border-color .2s;-webkit-appearance:none}
+  .setting-input:focus{border-color:var(--purple)}
+  .prize-preview{background:linear-gradient(135deg,#FFF0FF,#F0F0FF);border:2px solid var(--purple);border-radius:14px;padding:12px 16px;font-weight:800;color:#5B21B6;margin-top:8px;font-size:.95rem;min-height:42px}
+
+  /* ---- PIN MODAL ---- */
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px;padding-bottom:max(20px, var(--safe-bottom))}
+  .modal.show{display:flex;animation:fadeIn .25s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal-card{background:white;border-radius:28px;padding:32px 28px;text-align:center;max-width:340px;width:100%;animation:slideUp .3s cubic-bezier(.34,1.4,.64,1);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal-card h3{font-family:'Fredoka One',cursive;font-size:1.55rem;color:var(--ink);margin-bottom:5px}
+  .modal-card p{color:#888;font-weight:700;font-size:.92rem;margin-bottom:18px}
+  .pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:18px}
+  .pin-dot{width:17px;height:17px;border-radius:50%;border:2px solid #ddd;background:white;transition:all .2s}
+  .pin-dot.filled{background:var(--purple);border-color:var(--purple)}
+  .pin-dot.error{background:var(--coral);border-color:var(--coral);animation:shake .3s ease}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 14px}
+  .pin-key{font-family:'Fredoka One',cursive;font-size:1.4rem;padding:16px;border:none;border-radius:16px;background:#F5F5F5;cursor:pointer;transition:all .12s;color:var(--ink);min-height:56px;touch-action:manipulation}
+  .pin-key:active{transform:scale(.9);background:#E0E0E0}
+  .pin-error-msg{color:var(--coral);font-weight:800;font-size:.88rem;min-height:20px;margin-bottom:8px}
+
+  /* ---- BADGE MODAL ---- */
+  .badge-modal-card{background:white;border-radius:28px;padding:38px 28px;text-align:center;max-width:320px;width:100%;animation:slideUp .4s cubic-bezier(.34,1.4,.64,1);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  .badge-modal-card .bm-icon{font-size:4.5rem;display:block;margin-bottom:10px}
+  .badge-modal-card h3{font-family:'Fredoka One',cursive;font-size:1.7rem;color:var(--ink);margin-bottom:5px}
+  .badge-modal-card p{color:#888;font-weight:700;font-size:.95rem}
+
+  /* ---- CELEBRATION ---- */
+  .celebration{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:flex-end;justify-content:center;padding-bottom:var(--safe-bottom)}
+  .celebration.show{display:flex;animation:fadeIn .3s ease}
+  .celebrate-card{background:white;border-radius:28px 28px 0 0;padding:36px 28px calc(28px + var(--safe-bottom));text-align:center;width:100%;max-width:600px;animation:slideUp .4s cubic-bezier(.34,1.2,.64,1);box-shadow:0 -10px 40px rgba(0,0,0,.15)}
+  .celebrate-card .cel-emoji{font-size:4rem;margin-bottom:10px;display:block}
+  .celebrate-card h2{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--ink);margin-bottom:6px}
+  .celebrate-card p{font-size:1rem;font-weight:700;color:#666;margin-bottom:5px}
+  .prize-reveal{background:linear-gradient(135deg,var(--sun),#FFA500);border-radius:14px;padding:11px 16px;font-size:1.15rem;font-weight:800;color:white;margin:12px 0 18px;box-shadow:0 5px 18px rgba(255,165,0,.4)}
+  .streak-reveal{background:linear-gradient(135deg,var(--coral),#FF4F7B);border-radius:12px;padding:9px 14px;font-size:.95rem;font-weight:800;color:white;margin-bottom:8px}
+
+  /* ---- STARS ---- */
+  .stars{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;overflow:hidden}
+  .star{position:absolute;color:var(--sun);opacity:.12;animation:twinkle 3s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:.08;transform:scale(1)}50%{opacity:.25;transform:scale(1.3)}}
+
+  /* ---- LOGIN SCREEN ---- */
+  .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-top:calc(var(--safe-top) + 24px);padding-bottom:calc(var(--safe-bottom) + 24px)}
+  .login-card{background:white;border-radius:28px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.12);text-align:center}
+  .login-card .login-emoji{font-size:4rem;display:block;margin-bottom:12px;animation:float 3s ease-in-out infinite}
+  .login-card h2{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--ink);margin-bottom:6px}
+  .login-card p{font-size:.95rem;color:#888;font-weight:600;margin-bottom:24px;line-height:1.5}
+  .login-input{width:100%;padding:16px 18px;border-radius:16px;border:2.5px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:800;color:var(--ink);outline:none;transition:border-color .2s;text-align:center;letter-spacing:2px;text-transform:uppercase;-webkit-appearance:none}
+  .login-input:focus{border-color:var(--purple)}
+  .login-input::placeholder{letter-spacing:0;text-transform:none;font-weight:600;color:#ccc}
+  .login-error{color:var(--coral);font-weight:800;font-size:.9rem;min-height:22px;margin:10px 0 4px}
+  .word.speaking{background:var(--sky)!important;color:white!important;box-shadow:0 2px 10px rgba(110,198,245,.7)!important;animation:speak-pulse .6s ease-in-out!important}
+  @keyframes speak-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+
+  /* ---- RESPONSIVE ---- */
+  @media(min-width:480px){
+    .container{padding:24px 24px 100px}
+    .header h1{font-size:3rem}
+    .story-box{font-size:1.2rem}
+    .card{padding:28px}
+  }
+  @media(min-width:600px){
+    .streak-bar{gap:14px}
+    .streak-chip .chip-num{font-size:2.2rem}
+  }
+</style>
+</head>
+<body>
+
+<div class="sky">
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div class="sun-icon"></div>
+</div>
+<div class="stars" id="starsContainer"></div>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="display:none">
+  <div class="sky">
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+    <div class="sun-icon"></div>
+  </div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <span class="login-emoji">📚</span>
+      <h2>Welcome to StoryReader!</h2>
+      <p>Ask a grown-up for your family code to get started</p>
+      <input class="login-input" type="text" id="codeInput" placeholder="Enter your family code"
+        autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')submitCode()" />
+      <div class="login-error" id="loginError"></div>
+      <button class="btn btn-purple" onclick="submitCode()" style="width:100%;margin-top:4px">Let's Read! ✨</button>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="mainApp" style="display:none">
+  <div class="header">
+    <h1>⭐ StoryReader</h1>
+    <p>Your story, your adventure!</p>
+    <button class="parent-btn" onclick="openParentGate()" title="Parent Settings">⚙️</button>
+  </div>
+
+  <!-- SCREEN 1: IDEA -->
+  <div class="screen active" id="screenIdea">
+
+    <!-- Install banner (shown only when installable) -->
+    <div class="install-banner" id="installBanner" style="display:none">
+      <span class="ib-icon">📲</span>
+      <div class="ib-text">
+        <div class="ib-title">Add to Home Screen</div>
+        <div class="ib-sub">Launch like a real app — no browser bar!</div>
+      </div>
+      <button class="ib-btn" onclick="installApp()">Install</button>
+      <button class="ib-close" onclick="dismissInstall()">✕</button>
+    </div>
+
+    <!-- Streak bar -->
+    <div class="streak-bar">
+      <div class="streak-chip hot" id="streakChip">
+        <div class="chip-num" id="streakNum">0</div>
+        <div class="chip-label">🔥 Day Streak</div>
+      </div>
+      <div class="streak-chip gold" id="totalChip">
+        <div class="chip-num" id="totalNum">0</div>
+        <div class="chip-label">📚 Stories Read</div>
+      </div>
+    </div>
+
+    <div class="card active-card">
+      <div class="idea-hero">
+        <span class="big-emoji">🎙️</span>
+        <h2>What's your story about?</h2>
+        <p>Press the mic button and talk about what you want your story to be!</p>
+      </div>
+      <p class="mic-hint" id="ideaMicHint">Tap the mic to start — tap again when you're done!</p>
+      <button class="mic-big-btn" id="ideaMicBtn" onclick="toggleIdeaRecording()">🎤</button>
+      <div class="idea-heard empty" id="ideaHeard">Your idea will appear here...</div>
+      <div class="divider">— or type your idea instead —</div>
+      <input class="idea-input" type="text" id="ideaTyped" placeholder="e.g. a dragon who loves to bake cookies..." oninput="handleTypedIdea()" autocomplete="off" autocorrect="off" autocapitalize="sentences" />
+      <button class="btn btn-purple" id="makeStoryBtn" onclick="generateStory()" disabled style="margin-top:16px">✨ Make my story!</button>
+      <button class="btn btn-ghost" onclick="clearIdea()">🔄 Try again</button>
+    </div>
+
+    <!-- Trophies -->
+    <div class="card">
+      <div class="card-title"><div class="icon icon-orange">🏆</div>Trophy Shelf</div>
+      <div class="badge-row" id="badgeRow"></div>
+    </div>
+
+    <!-- History -->
+    <div class="card">
+      <div class="card-title"><div class="icon icon-green">📜</div>Reading History</div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <p style="text-align:center;color:#ccc;font-size:.78rem;margin-top:4px;padding-bottom:8px">💡 Works best in <strong>Google Chrome</strong> on Android, or <strong>Safari</strong> on iPhone</p>
+  </div>
+
+  <!-- SCREEN 2: LOADING -->
+  <div class="screen" id="screenLoading">
+    <div class="card">
+      <div class="loading-screen">
+        <span class="book-loader">📖</span>
+        <h2>Writing your story...</h2>
+        <p class="loading-idea-text" id="loadingIdea"></p>
+        <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="loading-msg" id="loadingMsg">Imagining the characters...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: READING -->
+  <div class="screen" id="screenReading">
+    <div class="card active-card">
+      <div class="card-title"><div class="icon icon-yellow">📖</div><span id="storyTitle">Your Story</span></div>
+      <div class="mic-status" id="micStatus"><div class="mic-dot" id="micDot"></div><span id="micLabel">Press the button below to start reading</span></div>
+      <button class="btn btn-primary" id="startBtn" onclick="startReading()">🎤 Start Reading Out Loud!</button>
+      <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()" style="display:none;margin-top:10px">⏸️ Pause Reading</button>
+      <div class="heard-box" id="heardBox" style="margin-top:10px">Your words will appear here as you read...</div>
+      <div style="margin-top:16px">
+        <p style="font-size:.78rem;color:#bbb;font-weight:700;margin-bottom:8px;text-align:center">💡 Tap any word to hear it spoken aloud</p>
+        <div class="story-box" id="storyDisplay"></div>
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="progress-label" id="progressLabel">0% read</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-yellow">🎁</div>Your Prize</div>
+      <div class="prize-display">
+        <div class="prize-emoji-display" id="prizeEmojiDisplay">🍦</div>
+        <div>Finish reading to earn: <strong id="prizeText">an ice cream cone!</strong></div>
+      </div>
+    </div>
+    <div class="card">
+      <button class="btn btn-ghost" onclick="goToIdeaScreen()">← New Story Idea</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: PARENT SETTINGS -->
+  <div class="screen" id="screenParent">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-purple">⚙️</div>Parent Settings</div>
+      <div class="setting-row">
+        <div class="setting-label">📚 Reading Level</div>
+        <div class="option-group" id="levelOptions">
+          <button class="option-btn" onclick="selectOption('level','1st grade',this)">1st Grade</button>
+          <button class="option-btn" onclick="selectOption('level','2nd grade',this)">2nd Grade</button>
+          <button class="option-btn selected" onclick="selectOption('level','3rd grade',this)">3rd Grade</button>
+          <button class="option-btn" onclick="selectOption('level','4th grade',this)">4th Grade</button>
+          <button class="option-btn" onclick="selectOption('level','5th grade',this)">5th Grade</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">⏱️ Reading Time</div>
+        <div class="option-group" id="lengthOptions">
+          <button class="option-btn" onclick="selectOption('length','short',this)">5 minutes</button>
+          <button class="option-btn selected" onclick="selectOption('length','medium',this)">10 minutes</button>
+          <button class="option-btn" onclick="selectOption('length','long',this)">15 minutes</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">🎁 Prize</div>
+        <input class="setting-input" type="text" id="prizeInput" placeholder="e.g. 30 minutes of Minecraft, a cookie..." oninput="updatePrizePreview()" autocomplete="off" />
+        <div class="prize-preview" id="prizePreview">🎁 Prize will show here</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">🔒 Parent PIN <span style="font-size:.78rem;color:#aaa;font-family:'Nunito',sans-serif;font-weight:600">(4 digits)</span></div>
+        <input class="setting-input" type="password" id="pinInput" placeholder="Enter a new 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" />
+        <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN. Default is 1234.</p>
+      </div>
+      <button class="btn btn-purple" onclick="saveSettings()">💾 Save Settings</button>
+      <button class="btn btn-sky" onclick="showScreen('screenIdea')">← Back to App</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end mainApp -->
+
+<!-- PIN MODAL -->
+<div class="modal" id="pinModal">
+  <div class="modal-card">
+    <h3>👋 Hey Parent!</h3>
+    <p>Enter your PIN to access settings</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-error-msg" id="pinErrorMsg"></div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" onclick="pinBackspace()">⌫</button>
+    </div>
+    <button class="btn btn-ghost" onclick="closePinModal()" style="font-size:1rem;padding:14px">Cancel</button>
+  </div>
+</div>
+
+<!-- BADGE MODAL -->
+<div class="modal" id="badgeModal">
+  <div class="badge-modal-card">
+    <span class="bm-icon" id="badgeModalIcon">🥉</span>
+    <h3 id="badgeModalTitle">New Badge!</h3>
+    <p id="badgeModalDesc">You earned a badge!</p>
+    <button class="btn btn-purple" onclick="closeBadgeModal()" style="width:100%;margin-top:20px">Awesome! 🎉</button>
+  </div>
+</div>
+
+<!-- CELEBRATION (slides up from bottom like a native sheet) -->
+<div class="celebration" id="celebration">
+  <div class="celebrate-card">
+    <span class="cel-emoji">🎉</span>
+    <h2>Amazing job!</h2>
+    <p>You read the whole story!</p>
+    <div class="streak-reveal" id="streakReveal">🌟 Story complete!</div>
+    <div class="prize-reveal" id="prizeReveal">🍦 You earned: an ice cream cone!</div>
+    <p style="font-size:.85rem;color:#bbb;margin-bottom:16px">Show this to a grown-up!</p>
+    <button class="btn btn-purple" onclick="closeAndNewStory()">Tell a New Story 🎙️</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// LOGIN
+// ============================================================
+const VALID_CODES=['VERSION123','RISHI123','JACK123','STRIPE123'];
+
+function checkLogin(){
+  try{
+    const saved=localStorage.getItem('sr_code');
+    if(saved && VALID_CODES.includes(saved)){
+      showApp();
+    } else {
+      document.getElementById('loginScreen').style.display='block';
+    }
+  } catch(e){
+    document.getElementById('loginScreen').style.display='block';
+  }
+}
+
+function submitCode(){
+  const val=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(VALID_CODES.includes(val)){
+    try{localStorage.setItem('sr_code',val);}catch(e){}
+    document.getElementById('loginError').textContent='';
+    showApp();
+  } else {
+    document.getElementById('loginError').textContent='Hmm, that code doesn't match — try again!';
+    document.getElementById('codeInput').select();
+  }
+}
+
+function showApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+const DEFAULT_SETTINGS={readingLevel:'3rd grade',storyLength:'medium',prize:'an ice cream cone!',prizeEmoji:'🍦',pin:'1234'};
+let settings={...DEFAULT_SETTINGS};
+function loadSettings(){try{const s=localStorage.getItem('sr_settings');if(s)settings={...DEFAULT_SETTINGS,...JSON.parse(s)};}catch(e){}}
+function saveSettingsToStorage(){try{localStorage.setItem('sr_settings',JSON.stringify(settings));}catch(e){}}
+
+// ============================================================
+// STATS
+// ============================================================
+const DEFAULT_STATS={totalStories:0,streak:0,lastReadDate:null,history:[]};
+let stats={...DEFAULT_STATS};
+function loadStats(){try{const s=localStorage.getItem('sr_stats');if(s)stats={...DEFAULT_STATS,...JSON.parse(s)};}catch(e){}}
+function saveStats(){try{localStorage.setItem('sr_stats',JSON.stringify(stats));}catch(e){}}
+
+function recordStoryFinished(ideaText){
+  const today=new Date().toDateString();
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(stats.lastReadDate===today){}
+  else if(stats.lastReadDate===yesterday)stats.streak++;
+  else stats.streak=1;
+  stats.lastReadDate=today;
+  stats.totalStories++;
+  stats.history.unshift({idea:ideaText,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
+  if(stats.history.length>10)stats.history=stats.history.slice(0,10);
+  saveStats();updateStatsUI();
+  checkNewBadge(stats.totalStories);
+}
+
+// ============================================================
+// BADGES
+// ============================================================
+const BADGES=[
+  {count:1, icon:'⭐',name:'First Story!',desc:"You read your very first story!"},
+  {count:5, icon:'🥉',name:'5 Stories!', desc:"You've read 5 whole stories!"},
+  {count:10,icon:'🥈',name:'10 Stories!',desc:"10 stories — you're a real reader!"},
+  {count:25,icon:'🥇',name:'25 Stories!',desc:"25 stories — reading superstar!"},
+  {count:50,icon:'🏆',name:'50 Stories!',desc:"50 stories — you're a legend!"},
+];
+
+function checkNewBadge(total){
+  const badge=BADGES.find(b=>b.count===total);
+  if(badge){setTimeout(()=>{document.getElementById('badgeModalIcon').textContent=badge.icon;document.getElementById('badgeModalTitle').textContent=badge.name;document.getElementById('badgeModalDesc').textContent=badge.desc;document.getElementById('badgeModal').classList.add('show');},2200);}
+}
+function closeBadgeModal(){document.getElementById('badgeModal').classList.remove('show');}
+
+function renderBadges(){
+  document.getElementById('badgeRow').innerHTML=BADGES.map(b=>{
+    const earned=stats.totalStories>=b.count;
+    return `<div class="badge ${earned?'earned':''}"><span class="badge-icon">${b.icon}</span><span class="badge-name">${b.name}</span></div>`;
+  }).join('');
+}
+
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  if(!stats.history.length){list.innerHTML='<div class="history-empty">No stories yet — read one to get started!</div>';return;}
+  list.innerHTML=stats.history.map(h=>`<div class="history-item"><span>📖</span><span class="h-idea">${h.idea}</span><span class="h-date">${h.date}</span></div>`).join('');
+}
+
+function updateStatsUI(){
+  document.getElementById('streakNum').textContent=stats.streak;
+  document.getElementById('totalNum').textContent=stats.totalStories;
+  renderBadges();renderHistory();
+}
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+let deferredInstallPrompt=null;
+
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  // Show banner only if not already installed
+  if(!window.matchMedia('(display-mode: standalone)').matches){
+    document.getElementById('installBanner').style.display='flex';
+  }
+});
+
+async function installApp(){
+  if(!deferredInstallPrompt)return;
+  deferredInstallPrompt.prompt();
+  const result=await deferredInstallPrompt.userChoice;
+  if(result.outcome==='accepted')dismissInstall();
+  deferredInstallPrompt=null;
+}
+
+function dismissInstall(){
+  document.getElementById('installBanner').style.display='none';
+  try{localStorage.setItem('sr_install_dismissed','1');}catch(e){}
+}
+
+// Hide banner if already dismissed
+try{if(localStorage.getItem('sr_install_dismissed'))document.getElementById('installBanner').style.display='none';}catch(e){}
+
+// ============================================================
+// WPM / WORD COUNT
+// ============================================================
+const WPM={'1st grade':60,'2nd grade':90,'3rd grade':110,'4th grade':130,'5th grade':150};
+const MINUTES={short:5,medium:10,long:15};
+function getWordCount(){const wpm=WPM[settings.readingLevel]||110;const mins=MINUTES[settings.storyLength]||10;const t=wpm*mins;return`${Math.round(t*.9)}-${Math.round(t*1.1)}`;}
+
+// ============================================================
+// STATE
+// ============================================================
+let words=[],wordIndex=0,recognition=null,isListening=false,isPaused=false;
+let ideaText='',ideaRecognition=null,ideaRecording=false;
+let pinEntry='',currentIdeaForHistory='';
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ============================================================
+// STARS
+// ============================================================
+function initStars(){
+  const c=document.getElementById('starsContainer');
+  for(let i=0;i<18;i++){const s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${.6+Math.random()*.7}rem`;c.appendChild(s);}
+}
+
+// ============================================================
+// MIC
+// ============================================================
+async function warmUpMic(){try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());}catch(e){}}
+
+// ============================================================
+// IDEA SCREEN
+// ============================================================
+function toggleIdeaRecording(){ideaRecording?stopIdeaRecording():startIdeaRecording();}
+
+function startIdeaRecording(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('ideaMicHint').textContent='⚠️ Please open in Google Chrome or Safari!';return;}
+  ideaRecording=true;ideaRecognition=new SR();ideaRecognition.continuous=true;ideaRecognition.interimResults=true;ideaRecognition.lang='en-US';
+  const btn=document.getElementById('ideaMicBtn');btn.classList.add('recording');btn.textContent='⏹️';
+  document.getElementById('ideaMicHint').textContent='🎤 Listening... tap again when done!';
+  ideaRecognition.onresult=(event)=>{
+    let t='';for(let i=0;i<event.results.length;i++)t+=event.results[i][0].transcript;
+    ideaText=t.trim();const el=document.getElementById('ideaHeard');
+    el.textContent='"'+ideaText+'"';el.classList.remove('empty');
+    document.getElementById('ideaTyped').value=ideaText;
+    document.getElementById('makeStoryBtn').disabled=ideaText.length<3;
+  };
+  ideaRecognition.onerror=(e)=>{if(e.error!=='aborted')document.getElementById('ideaMicHint').textContent='⚠️ Mic error — try typing instead!';ideaRecording=false;btn.classList.remove('recording');btn.textContent='🎤';};
+  ideaRecognition.onend=()=>{if(ideaRecording){try{ideaRecognition.start();}catch(e){}}};
+  ideaRecognition.start();
+}
+
+function stopIdeaRecording(){
+  ideaRecording=false;if(ideaRecognition){try{ideaRecognition.stop();}catch(e){}ideaRecognition=null;}
+  const btn=document.getElementById('ideaMicBtn');btn.classList.remove('recording');btn.textContent='🎤';
+  document.getElementById('ideaMicHint').textContent=ideaText?'Tap "Make my story!" when ready 👇':"Tap the mic to start — tap again when done!";
+}
+
+function handleTypedIdea(){
+  const val=document.getElementById('ideaTyped').value.trim();ideaText=val;
+  const el=document.getElementById('ideaHeard');
+  if(val.length>0){el.textContent='"'+val+'"';el.classList.remove('empty');document.getElementById('makeStoryBtn').disabled=false;}
+  else{el.textContent='Your idea will appear here...';el.classList.add('empty');document.getElementById('makeStoryBtn').disabled=true;}
+}
+
+function clearIdea(){
+  ideaText='';stopIdeaRecording();document.getElementById('ideaTyped').value='';
+  const el=document.getElementById('ideaHeard');el.textContent='Your idea will appear here...';el.classList.add('empty');
+  document.getElementById('makeStoryBtn').disabled=true;
+  document.getElementById('ideaMicHint').textContent="Tap the mic to start — tap again when you're done!";
+}
+
+function goToIdeaScreen(){if(recognition){isListening=false;try{recognition.stop();}catch(e){}}clearIdea();showScreen('screenIdea');}
+
+// ============================================================
+// STORY GENERATION
+// ============================================================
+const loadingMessages=["Imagining the characters...","Building the world...","Adding some adventure...","Choosing the best words...","Almost ready...","Putting on the finishing touches..."];
+
+async function generateStory(){
+  if(!ideaText)return;
+  currentIdeaForHistory=ideaText;
+  showScreen('screenLoading');
+  document.getElementById('loadingIdea').textContent='"'+ideaText+'"';
+  let msgIdx=0;const msgEl=document.getElementById('loadingMsg');msgEl.textContent=loadingMessages[0];
+  const interval=setInterval(()=>{msgIdx=(msgIdx+1)%loadingMessages.length;msgEl.textContent=loadingMessages[msgIdx];},1800);
+  try{
+    const wordCount=getWordCount();
+    const response=await fetch("https://frosty-meadow-2088.steve-jaffe.workers.dev",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:1500,
+        system:`You are a children's story writer. Write a short story at a ${settings.readingLevel} reading level.
+Rules:
+- Exactly ${wordCount} words long
+- Fun, adventurous, with a satisfying ending
+- Vocabulary and sentence complexity appropriate for ${settings.readingLevel}
+- Do NOT include a title
+- Return ONLY the story text, nothing else`,
+        messages:[{role:"user",content:`Write a children's story based on this idea: "${ideaText}"`}]
+      })
+    });
+    clearInterval(interval);
+    if(!response.ok)throw new Error(response.status);
+    const text=await response.text();const data=JSON.parse(text);
+    const storyText=data.content[0].text.trim();
+    const title='The Story of '+ideaText.split(' ').slice(0,5).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+    loadStory(storyText,title);showScreen('screenReading');
+  }catch(err){
+    clearInterval(interval);
+    loadStory("Uh oh! The story magic had a little hiccup. Please press 'New Story Idea' below and try again.","Oops!");
+    showScreen('screenReading');
+  }
+}
+
+// ============================================================
+// LOAD STORY
+// ============================================================
+function loadStory(text,title){
+  wordIndex=0;isListening=false;if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
+  document.getElementById('storyTitle').textContent=title;
+  document.getElementById('prizeText').textContent=settings.prize;
+  document.getElementById('prizeEmojiDisplay').textContent=settings.prizeEmoji;
+  document.getElementById('prizeReveal').textContent=settings.prizeEmoji+' You earned: '+settings.prize;
+  words=text.split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'').toLowerCase()).filter(w=>w.length>0);
+  document.getElementById('storyDisplay').innerHTML=text.split(/\s+/).map((w,i)=>`<span class="word" id="word-${i}" onclick="hearWord(${i})">${w} </span>`).join('');
+  highlightCurrent();
+  document.getElementById('startBtn').style.display='block';document.getElementById('pauseBtn').style.display='none';
+  document.getElementById('micDot').classList.remove('active');document.getElementById('micStatus').classList.remove('listening');
+  document.getElementById('micLabel').textContent='Press the button below to start reading';
+  document.getElementById('heardBox').textContent='Your words will appear here as you read...';
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){document.getElementById('startBtn').disabled=true;document.getElementById('micLabel').textContent='⚠️ Please open in Chrome (Android) or Safari (iPhone)';}
+}
+
+// ============================================================
+// HIGHLIGHT
+// ============================================================
+function highlightCurrent(){
+  document.querySelectorAll('.word').forEach((el,i)=>{el.classList.remove('current');if(i<wordIndex)el.classList.add('read');});
+  const el=document.getElementById('word-'+wordIndex);
+  if(el){el.classList.add('current');el.scrollIntoView({behavior:'smooth',block:'center'});}
+  const pct=Math.round((wordIndex/Math.max(words.length,1))*100);
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=pct+'% read';
+}
+
+// ============================================================
+// SPEECH MATCHING
+// ============================================================
+const SKIP_WORDS=new Set(['a','an','the','and','or','but','in','on','at','to','of','it','is','was','he','she','they','we','i','my','his','her','its','as','up','so','do','be','by','if','no','us','am']);
+function editDistance(a,b){if(a===b)return 0;const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>[i]);for(let j=0;j<=n;j++)dp[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
+function isMatch(s,t){if(!s||!t)return false;if(s===t)return true;return editDistance(s,t)<=(t.length<=4?1:2);}
+function skipTinyWords(){while(wordIndex<words.length&&SKIP_WORDS.has(words[wordIndex]))wordIndex++;}
+
+// ============================================================
+// READING
+// ============================================================
+function startReading(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+  recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
+  let consumed=0;
+  recognition.onstart=()=>{isListening=true;consumed=0;document.getElementById('micDot').classList.add('active');document.getElementById('micStatus').classList.add('listening');document.getElementById('micLabel').textContent='🎤 Listening... Read the highlighted word!';document.getElementById('startBtn').style.display='none';document.getElementById('pauseBtn').style.display='block';skipTinyWords();highlightCurrent();};
+  recognition.onresult=(event)=>{
+    let full='';for(let i=0;i<event.results.length;i++)full+=event.results[i][0].transcript;
+    document.getElementById('heardBox').textContent='🎧 Hearing: "'+full.trim().slice(-60)+'"';
+    const spoken=full.slice(consumed).trim().toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
+    for(const s of spoken){
+      if(wordIndex>=words.length)break;
+      if(isMatch(s,words[wordIndex])){wordIndex++;skipTinyWords();highlightCurrent();consumed=full.length;if(wordIndex>=words.length){celebrate();return;}continue;}
+      for(let look=1;look<=3&&(wordIndex+look)<words.length;look++){if(isMatch(s,words[wordIndex+look])){wordIndex+=look+1;skipTinyWords();highlightCurrent();consumed=full.length;if(wordIndex>=words.length){celebrate();return;}break;}}
+    }
+  };
+  recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micLabel').textContent='⚠️ Microphone blocked — please allow access!';};
+  recognition.onend=()=>{if(isListening&&!isPaused&&wordIndex<words.length)recognition.start();};
+  recognition.start();
+}
+
+function togglePause(){
+  if(isPaused){
+    isPaused=false;
+    isListening=true;
+    document.getElementById('pauseBtn').textContent='⏸️ Pause Reading';
+    document.getElementById('pauseBtn').classList.remove('btn-primary');
+    document.getElementById('pauseBtn').classList.add('btn-secondary');
+    document.getElementById('micDot').classList.add('active');
+    document.getElementById('micStatus').classList.add('listening');
+    document.getElementById('micLabel').textContent='🎤 Listening... Read the highlighted word!';
+    if(recognition){try{recognition.start();}catch(e){}}
+  } else {
+    isPaused=true;
+    isListening=false;
+    if(recognition){try{recognition.stop();}catch(e){}}
+    document.getElementById('pauseBtn').textContent='▶️ Resume Reading';
+    document.getElementById('pauseBtn').classList.remove('btn-secondary');
+    document.getElementById('pauseBtn').classList.add('btn-primary');
+    document.getElementById('micDot').classList.remove('active');
+    document.getElementById('micStatus').classList.remove('listening');
+    document.getElementById('micLabel').textContent='⏸️ Paused — tap Resume when ready!';
+  }
+}
+
+function resetReading(){
+  isPaused=false;
+  if(recognition){isListening=false;try{recognition.stop();}catch(e){}}
+  wordIndex=0;document.querySelectorAll('.word').forEach(el=>el.classList.remove('read','current'));
+  highlightCurrent();document.getElementById('micDot').classList.remove('active');document.getElementById('micStatus').classList.remove('listening');
+  document.getElementById('micLabel').textContent='Press the button below to start reading';
+  document.getElementById('heardBox').textContent='Your words will appear here as you read...';
+  document.getElementById('startBtn').style.display='block';document.getElementById('pauseBtn').style.display='none';
+  document.getElementById('pauseBtn').textContent='⏸️ Pause Reading';
+  document.getElementById('pauseBtn').classList.remove('btn-primary');
+  document.getElementById('pauseBtn').classList.add('btn-secondary');
+}
+
+// ============================================================
+// PARENT SETTINGS
+// ============================================================
+function openParentGate(){pinEntry='';updatePinDots();document.getElementById('pinErrorMsg').textContent='';document.getElementById('pinModal').classList.add('show');}
+function closePinModal(){document.getElementById('pinModal').classList.remove('show');pinEntry='';updatePinDots();}
+function pinPress(digit){
+  if(pinEntry.length>=4)return;pinEntry+=digit;updatePinDots();
+  if(pinEntry.length===4){
+    if(pinEntry===settings.pin){closePinModal();openParentSettings();}
+    else{document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));document.getElementById('pinErrorMsg').textContent='Wrong PIN — try again!';setTimeout(()=>{pinEntry='';updatePinDots();document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErrorMsg').textContent='';},900);}
+  }
+}
+function pinBackspace(){pinEntry=pinEntry.slice(0,-1);updatePinDots();}
+function updatePinDots(){for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('filled',i<pinEntry.length);}
+function openParentSettings(){
+  document.querySelectorAll('#levelOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(settings.readingLevel.split(' ')[0])));
+  document.querySelectorAll('#lengthOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(MINUTES[settings.storyLength]+'') ));
+  document.getElementById('prizeInput').value=settings.prize;updatePrizePreview();document.getElementById('pinInput').value='';
+  showScreen('screenParent');
+}
+function selectOption(type,value,el){
+  const gid=type==='level'?'levelOptions':'lengthOptions';
+  document.querySelectorAll('#'+gid+' .option-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');
+  if(type==='level')settings.readingLevel=value;else settings.storyLength=value;
+}
+function updatePrizePreview(){const val=document.getElementById('prizeInput').value.trim();document.getElementById('prizePreview').textContent=val?'🎁 Prize: '+val:'🎁 Prize will show here';}
+function saveSettings(){
+  const pv=document.getElementById('prizeInput').value.trim();if(pv)settings.prize=pv;
+  const pn=document.getElementById('pinInput').value.trim();
+  if(pn){if(pn.length!==4||!/^\d{4}$/.test(pn)){alert('PIN must be exactly 4 numbers!');return;}settings.pin=pn;}
+  saveSettingsToStorage();
+  const btn=document.querySelector('#screenParent .btn-purple');const orig=btn.textContent;
+  btn.textContent='✅ Saved!';setTimeout(()=>btn.textContent=orig,1500);
+}
+
+// ============================================================
+// CELEBRATION
+// ============================================================
+function celebrate(){
+  isListening=false;if(recognition){try{recognition.stop();}catch(e){}}document.getElementById('pauseBtn').style.display='none';
+  document.getElementById('micLabel').textContent='🎉 You did it! Amazing reading!';
+  recordStoryFinished(currentIdeaForHistory);
+  document.getElementById('streakReveal').textContent=stats.streak>1?`🔥 ${stats.streak} day streak! Keep it up!`:'🌟 Story #'+stats.totalStories+' complete!';
+  setTimeout(()=>{document.getElementById('celebration').classList.add('show');launchConfetti();},600);
+}
+
+function launchConfetti(){
+  const colors=['#FFD166','#FF6B6B','#06D6A0','#A78BFA','#6EC6F5'];
+  if(!document.getElementById('fallStyle')){const s=document.createElement('style');s.id='fallStyle';s.textContent='@keyframes fall{to{top:110vh;transform:rotate(720deg)}}';document.head.appendChild(s);}
+  for(let i=0;i<60;i++){const p=document.createElement('div');p.style.cssText=`position:fixed;left:${Math.random()*100}%;top:-20px;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation:fall ${1.5+Math.random()*2}s ease-in forwards;animation-delay:${Math.random()*1.5}s;z-index:300;pointer-events:none`;document.body.appendChild(p);setTimeout(()=>p.remove(),4000);}
+}
+
+function closeAndNewStory(){document.getElementById('celebration').classList.remove('show');clearIdea();showScreen('screenIdea');}
+
+// ============================================================
+// TAP TO HEAR A WORD
+// ============================================================
+// Unlock speech synthesis on first user interaction (Chrome requires this)
+let speechUnlocked=false;
+function unlockSpeech(){
+  if(speechUnlocked) return;
+  const utt=new SpeechSynthesisUtterance('');
+  window.speechSynthesis.speak(utt);
+  speechUnlocked=true;
+}
+document.addEventListener('click', unlockSpeech, {once:true});
+
+function hearWord(idx){
+  // Only speak current or upcoming words — not already-read ones
+  if(idx < wordIndex) return;
+  const el=document.getElementById('word-'+idx);
+  if(!el) return;
+  // Get the clean word text
+  const raw=el.textContent.trim().replace(/[^a-zA-Z',-]/g,'');
+  if(!raw) return;
+  // Cancel any current speech
+  window.speechSynthesis.cancel();
+  // Animate the word
+  el.classList.add('speaking');
+  setTimeout(()=>el.classList.remove('speaking'),800);
+  // Speak it — slight delay lets cancel() finish first
+  setTimeout(()=>{
+    const utt=new SpeechSynthesisUtterance(raw);
+    utt.rate=0.82;
+    utt.pitch=1.1;
+    utt.volume=1;
+    window.speechSynthesis.speak(utt);
+  },50);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadSettings();loadStats();initStars();warmUpMic();updateStatsUI();checkLogin();
+</script>
+</body>
+</html>
