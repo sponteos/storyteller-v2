@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
       <span class="ib-icon">📲</span>
       <div class="ib-text">
         <div class="ib-title">Add to Home Screen</div>
-        <div class="ib-sub">Launch like a real app — no browser bar!</div>
+        <div class="ib-sub">Launch like a real app  -  no browser bar!</div>
       </div>
       <button class="ib-btn" onclick="installApp()">Install</button>
       <button class="ib-close" onclick="dismissInstall()">✕</button>
@@ -308,10 +308,10 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
         <h2>What's your story about?</h2>
         <p>Press the mic button and talk about what you want your story to be!</p>
       </div>
-      <p class="mic-hint" id="ideaMicHint">Tap the mic to start — tap again when you're done!</p>
+      <p class="mic-hint" id="ideaMicHint">Tap the mic to start  -  tap again when you're done!</p>
       <button class="mic-big-btn" id="ideaMicBtn" onclick="toggleIdeaRecording()">🎤</button>
       <div class="idea-heard empty" id="ideaHeard">Your idea will appear here...</div>
-      <div class="divider">— or type your idea instead —</div>
+      <div class="divider"> -  or type your idea instead  - </div>
       <input class="idea-input" type="text" id="ideaTyped" placeholder="e.g. a dragon who loves to bake cookies..." oninput="handleTypedIdea()" autocomplete="off" autocorrect="off" autocapitalize="sentences" />
       <button class="btn btn-purple" id="makeStoryBtn" onclick="generateStory()" disabled style="margin-top:16px">✨ Make my story!</button>
       <button class="btn btn-ghost" onclick="clearIdea()">🔄 Try again</button>
@@ -488,7 +488,7 @@ function submitCode(){
     document.getElementById('loginError').textContent='';
     showApp();
   } else {
-    document.getElementById('loginError').textContent='Hmm, that code doesn't match — try again!';
+    document.getElementById('loginError').textContent='Hmm, that code doesn't match  -  try again!';
     document.getElementById('codeInput').select();
   }
 }
@@ -534,9 +534,9 @@ function recordStoryFinished(ideaText){
 const BADGES=[
   {count:1, icon:'⭐',name:'First Story!',desc:"You read your very first story!"},
   {count:5, icon:'🥉',name:'5 Stories!', desc:"You've read 5 whole stories!"},
-  {count:10,icon:'🥈',name:'10 Stories!',desc:"10 stories — you're a real reader!"},
-  {count:25,icon:'🥇',name:'25 Stories!',desc:"25 stories — reading superstar!"},
-  {count:50,icon:'🏆',name:'50 Stories!',desc:"50 stories — you're a legend!"},
+  {count:10,icon:'🥈',name:'10 Stories!',desc:"10 stories  -  you're a real reader!"},
+  {count:25,icon:'🥇',name:'25 Stories!',desc:"25 stories  -  reading superstar!"},
+  {count:50,icon:'🏆',name:'50 Stories!',desc:"50 stories  -  you're a legend!"},
 ];
 
 function checkNewBadge(total){
@@ -554,7 +554,7 @@ function renderBadges(){
 
 function renderHistory(){
   const list=document.getElementById('historyList');
-  if(!stats.history.length){list.innerHTML='<div class="history-empty">No stories yet — read one to get started!</div>';return;}
+  if(!stats.history.length){list.innerHTML='<div class="history-empty">No stories yet  -  read one to get started!</div>';return;}
   list.innerHTML=stats.history.map(h=>`<div class="history-item"><span>📖</span><span class="h-idea">${h.idea}</span><span class="h-date">${h.date}</span></div>`).join('');
 }
 
@@ -648,7 +648,7 @@ function startIdeaRecording(){
     document.getElementById('ideaTyped').value=ideaText;
     document.getElementById('makeStoryBtn').disabled=ideaText.length<3;
   };
-  ideaRecognition.onerror=(e)=>{if(e.error!=='aborted')document.getElementById('ideaMicHint').textContent='⚠️ Mic error — try typing instead!';ideaRecording=false;btn.classList.remove('recording');btn.textContent='🎤';};
+  ideaRecognition.onerror=(e)=>{if(e.error!=='aborted')document.getElementById('ideaMicHint').textContent='⚠️ Mic error  -  try typing instead!';ideaRecording=false;btn.classList.remove('recording');btn.textContent='🎤';};
   ideaRecognition.onend=()=>{if(ideaRecording){try{ideaRecognition.start();}catch(e){}}};
   ideaRecognition.start();
 }
@@ -656,7 +656,7 @@ function startIdeaRecording(){
 function stopIdeaRecording(){
   ideaRecording=false;if(ideaRecognition){try{ideaRecognition.stop();}catch(e){}ideaRecognition=null;}
   const btn=document.getElementById('ideaMicBtn');btn.classList.remove('recording');btn.textContent='🎤';
-  document.getElementById('ideaMicHint').textContent=ideaText?'Tap "Make my story!" when ready 👇':"Tap the mic to start — tap again when done!";
+  document.getElementById('ideaMicHint').textContent=ideaText?'Tap "Make my story!" when ready 👇':"Tap the mic to start  -  tap again when done!";
 }
 
 function handleTypedIdea(){
@@ -670,7 +670,7 @@ function clearIdea(){
   ideaText='';stopIdeaRecording();document.getElementById('ideaTyped').value='';
   const el=document.getElementById('ideaHeard');el.textContent='Your idea will appear here...';el.classList.add('empty');
   document.getElementById('makeStoryBtn').disabled=true;
-  document.getElementById('ideaMicHint').textContent="Tap the mic to start — tap again when you're done!";
+  document.getElementById('ideaMicHint').textContent="Tap the mic to start  -  tap again when you're done!";
 }
 
 function goToIdeaScreen(){if(recognition){isListening=false;try{recognition.stop();}catch(e){}}clearIdea();showScreen('screenIdea');}
@@ -773,7 +773,7 @@ function startReading(){
       for(let look=1;look<=3&&(wordIndex+look)<words.length;look++){if(isMatch(s,words[wordIndex+look])){wordIndex+=look+1;skipTinyWords();highlightCurrent();consumed=full.length;if(wordIndex>=words.length){celebrate();return;}break;}}
     }
   };
-  recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micLabel').textContent='⚠️ Microphone blocked — please allow access!';};
+  recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micLabel').textContent='⚠️ Microphone blocked  -  please allow access!';};
   recognition.onend=()=>{if(isListening&&!isPaused&&wordIndex<words.length)recognition.start();};
   recognition.start();
 }
@@ -798,7 +798,7 @@ function togglePause(){
     document.getElementById('pauseBtn').classList.add('btn-primary');
     document.getElementById('micDot').classList.remove('active');
     document.getElementById('micStatus').classList.remove('listening');
-    document.getElementById('micLabel').textContent='⏸️ Paused — tap Resume when ready!';
+    document.getElementById('micLabel').textContent='⏸️ Paused  -  tap Resume when ready!';
   }
 }
 
@@ -824,7 +824,7 @@ function pinPress(digit){
   if(pinEntry.length>=4)return;pinEntry+=digit;updatePinDots();
   if(pinEntry.length===4){
     if(pinEntry===settings.pin){closePinModal();openParentSettings();}
-    else{document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));document.getElementById('pinErrorMsg').textContent='Wrong PIN — try again!';setTimeout(()=>{pinEntry='';updatePinDots();document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErrorMsg').textContent='';},900);}
+    else{document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));document.getElementById('pinErrorMsg').textContent='Wrong PIN  -  try again!';setTimeout(()=>{pinEntry='';updatePinDots();document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErrorMsg').textContent='';},900);}
   }
 }
 function pinBackspace(){pinEntry=pinEntry.slice(0,-1);updatePinDots();}
@@ -883,7 +883,7 @@ function unlockSpeech(){
 document.addEventListener('click', unlockSpeech, {once:true});
 
 function hearWord(idx){
-  // Only speak current or upcoming words — not already-read ones
+  // Only speak current or upcoming words  -  not already-read ones
   if(idx < wordIndex) return;
   const el=document.getElementById('word-'+idx);
   if(!el) return;
@@ -895,7 +895,7 @@ function hearWord(idx){
   // Animate the word
   el.classList.add('speaking');
   setTimeout(()=>el.classList.remove('speaking'),800);
-  // Speak it — slight delay lets cancel() finish first
+  // Speak it  -  slight delay lets cancel() finish first
   setTimeout(()=>{
     const utt=new SpeechSynthesisUtterance(raw);
     utt.rate=0.82;
