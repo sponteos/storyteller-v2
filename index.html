@@ -266,16 +266,10 @@
     <button class="parent-btn" onclick="openParentGate()" title="Parent Settings">⚙️</button>
   </div>
 
-  <!-- SCREEN: CHILD PICKER -->
-  <div class="screen active" id="screenPicker">
-    <div class="card">
-      <div class="card-title"><div class="icon icon-yellow">👋</div>Who is reading today?</div>
-      <div class="child-grid" id="childGrid"></div>
-    </div>
-  </div>
+
 
   <!-- SCREEN: IDEA -->
-  <div class="screen" id="screenIdea">
+  <div class="screen active" id="screenIdea">
     <div class="streak-bar">
       <div class="streak-chip hot"><div class="chip-num" id="streakNum">0</div><div class="chip-label">🔥 Day Streak</div></div>
       <div class="streak-chip gold"><div class="chip-num" id="totalNum">0</div><div class="chip-label">📚 Stories Read</div></div>
@@ -302,7 +296,7 @@
       <div class="card-title"><div class="icon icon-green">📜</div>Reading History</div>
       <div class="history-list" id="historyList"></div>
     </div>
-    <button class="btn btn-ghost" onclick="showScreen('screenPicker');loadChildPicker()" style="margin-bottom:8px">👈 Switch Reader</button>
+
     <p style="text-align:center;color:#ccc;font-size:.78rem;margin-top:4px">💡 Works best in Chrome (Android) or Safari (iPhone)</p>
   </div>
 
@@ -351,9 +345,13 @@
       <div id="dashboardContent"><div style="text-align:center;color:#ccc;padding:20px">Loading...</div></div>
     </div>
     <div class="card">
-      <div class="card-title"><div class="icon icon-purple">⚙️</div>Settings</div>
-      <p style="font-size:.85rem;color:#aaa;font-weight:600;margin-bottom:16px">Select a child to edit their settings</p>
+      <div class="card-title"><div class="icon icon-yellow">👤</div>Current Reader</div>
       <div class="option-group" id="settingsChildPicker" style="margin-bottom:16px"></div>
+      <button class="btn btn-sky" onclick="openAddChildModal()" style="margin-top:4px">➕ Add New Reader</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-purple">⚙️</div>Reader Settings</div>
+      <p style="font-size:.85rem;color:#aaa;font-weight:600;margin-bottom:16px">Editing settings for: <strong id="settingsChildName">-</strong></p>
       <div id="childSettingsForm">
         <div class="setting-row">
           <div class="setting-label">📚 Reading Level</div>
@@ -387,7 +385,7 @@
       <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN. Default is 1234.</p>
       <button class="btn btn-sky" onclick="savePin()" style="margin-top:12px">Save PIN</button>
     </div>
-    <button class="btn btn-ghost" onclick="showScreen('screenPicker');loadChildPicker()">← Back to App</button>
+    <button class="btn btn-ghost" onclick="showScreen('screenIdea')">← Back to App</button>
   </div>
 
 </div><!-- end container -->
@@ -569,7 +567,15 @@ async function loginWithCode(code, silent){
   loadPin();
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
-  await loadChildPicker();
+  // Load children and auto-select first one
+  allChildren = await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
+  if(allChildren&&allChildren.length>0){
+    await selectChild(allChildren[0]);
+  } else {
+    // No children yet - show idea screen with no child selected
+    showScreen('screenIdea');
+    document.getElementById('headerSub').textContent='Add a reader in ⚙️ Settings!';
+  }
 }
 
 // ============================================================
@@ -957,8 +963,17 @@ async function loadDashboard(){
 
 function loadSettingsChildPicker(){
   const picker=document.getElementById('settingsChildPicker');
-  picker.innerHTML=allChildren.map(c=>`<button class="option-btn${settingsChildId===c.id?' selected':''}" onclick="selectSettingsChild('${c.id}',this)">${c.avatar} ${c.name}</button>`).join('');
-  if(currentChild){selectSettingsChildById(currentChild.id);}
+  if(!allChildren||allChildren.length===0){
+    picker.innerHTML='<p style="color:#ccc;font-size:.9rem;font-weight:600">No readers yet - add one above!</p>';
+    return;
+  }
+  picker.innerHTML=allChildren.map(c=>`<button class="option-btn${currentChild&&currentChild.id===c.id?' selected':''}" onclick="selectSettingsChild('${c.id}',this)">${c.avatar} ${c.name}</button>`).join('');
+  if(currentChild){
+    settingsChildId=currentChild.id;
+    const nameEl=document.getElementById('settingsChildName');
+    if(nameEl)nameEl.textContent=currentChild.name;
+    selectSettingsChildById(currentChild.id);
+  }
 }
 
 function selectSettingsChild(id,el){
@@ -967,6 +982,12 @@ function selectSettingsChild(id,el){
   el.classList.add('selected');
   const child=allChildren.find(c=>c.id===id);
   if(!child)return;
+  // Switch the active reader
+  selectChild(child);
+  // Update name label
+  const nameEl=document.getElementById('settingsChildName');
+  if(nameEl)nameEl.textContent=child.name;
+  // Update settings form
   document.querySelectorAll('#levelOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(child.reading_level.split(' ')[0])));
   document.querySelectorAll('#lengthOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(MINUTES[child.story_length]+'')));
   document.getElementById('prizeInput').value=child.prize||'';
