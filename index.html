@@ -8,38 +8,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Story Reader">
-<title>Story Reader ⭐</title>
-
-<!-- PWA Manifest (inline) -->
-<script>
-const manifestData={name:"Story Reader",short_name:"Story Reader",description:"AI-powered reading adventure for kids!",start_url:"./",display:"standalone",background_color:"#FFFBF0",theme_color:"#6EC6F5",orientation:"portrait",icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#6EC6F5"/><text y="130" x="96" font-size="110" text-anchor="middle">⭐</text></svg>'),sizes:"192x192",type:"image/svg+xml"},{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#6EC6F5"/><text y="360" x="256" font-size="300" text-anchor="middle">⭐</text></svg>'),sizes:"512x512",type:"image/svg+xml"}]};
-const blob=new Blob([JSON.stringify(manifestData)],{type:"application/json"});
-const manifestURL=URL.createObjectURL(blob);
-document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement("link");l.rel="manifest";l.href=manifestURL;document.head.appendChild(l);});
-</script>
-
+<title>Story Reader</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --sky:#6EC6F5;--sun:#FFD166;--grass:#06D6A0;--coral:#FF6B6B;--purple:#A78BFA;--cream:#FFFBF0;--ink:#2D2A3E;
-    --safe-top:env(safe-area-inset-top, 0px);
-    --safe-bottom:env(safe-area-inset-bottom, 0px);
-    --safe-left:env(safe-area-inset-left, 0px);
-    --safe-right:env(safe-area-inset-right, 0px);
+    --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+    --safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;overscroll-behavior:none}
-  body{
-    font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);
-    min-height:100vh;min-height:-webkit-fill-available;
-    overflow-x:hidden;
-    padding-top:var(--safe-top);
-    padding-bottom:var(--safe-bottom);
-    padding-left:var(--safe-left);
-    padding-right:var(--safe-right);
-  }
+  body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;padding-top:var(--safe-top);padding-bottom:var(--safe-bottom);padding-left:var(--safe-left);padding-right:var(--safe-right)}
 
-  /* ---- SKY ---- */
+  /* SKY */
   .sky{position:fixed;top:0;left:0;right:0;height:220px;background:linear-gradient(180deg,#B8E4FF 0%,#E8F6FF 100%);z-index:0;overflow:hidden;padding-top:var(--safe-top)}
   .cloud{position:absolute;background:white;border-radius:50px;opacity:.85;animation:drift linear infinite}
   .cloud::before,.cloud::after{content:'';position:absolute;background:white;border-radius:50%}
@@ -47,61 +28,71 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   .c2{width:70px;height:26px;top:90px;animation-duration:35s;animation-delay:-10s}.c2::before{width:36px;height:36px;top:-18px;left:9px}.c2::after{width:26px;height:26px;top:-12px;left:30px}
   .c3{width:90px;height:30px;top:30px;animation-duration:22s;animation-delay:-5s}.c3::before{width:45px;height:45px;top:-22px;left:10px}.c3::after{width:36px;height:36px;top:-16px;left:40px}
   @keyframes drift{from{left:-200px}to{left:110%}}
-  .sun-icon{position:absolute;top:max(20px, calc(var(--safe-top) + 10px));right:20px;width:60px;height:60px;background:var(--sun);border-radius:50%;box-shadow:0 0 0 10px rgba(255,209,102,.3),0 0 0 20px rgba(255,209,102,.1);animation:sun-pulse 3s ease-in-out infinite}
+  .sun-icon{position:absolute;top:max(20px,calc(var(--safe-top) + 10px));right:20px;width:60px;height:60px;background:var(--sun);border-radius:50%;box-shadow:0 0 0 10px rgba(255,209,102,.3),0 0 0 20px rgba(255,209,102,.1);animation:sun-pulse 3s ease-in-out infinite}
   @keyframes sun-pulse{0%,100%{box-shadow:0 0 0 10px rgba(255,209,102,.3),0 0 0 20px rgba(255,209,102,.1)}50%{box-shadow:0 0 0 16px rgba(255,209,102,.3),0 0 0 30px rgba(255,209,102,.1)}}
 
-  /* ---- LAYOUT ---- */
+  /* LAYOUT */
   .container{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:20px 16px 100px}
-
-  /* ---- HEADER ---- */
-  .header{text-align:center;padding-top:max(28px, calc(var(--safe-top) + 12px));margin-bottom:20px;position:relative}
+  .header{text-align:center;padding-top:max(28px,calc(var(--safe-top) + 12px));margin-bottom:20px;position:relative}
   .header h1{font-family:'Fredoka One',cursive;font-size:2.6rem;color:white;text-shadow:2px 3px 0 rgba(0,0,0,.12);letter-spacing:1px}
   .header p{font-size:1rem;color:rgba(255,255,255,.9);font-weight:700;margin-top:4px}
-  .parent-btn{position:absolute;top:max(28px, calc(var(--safe-top) + 12px));right:0;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);border-radius:14px;padding:10px 14px;cursor:pointer;font-size:1.3rem;transition:all .2s;color:white;min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center}
+  .parent-btn{position:absolute;top:max(28px,calc(var(--safe-top) + 12px));right:0;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);border-radius:14px;padding:10px 14px;cursor:pointer;font-size:1.3rem;transition:all .2s;color:white;min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center}
   .parent-btn:active{background:rgba(255,255,255,.5);transform:scale(.93)}
-
-  /* ---- SCREENS ---- */
-  .screen{display:none}
-  .screen.active{display:block;animation:fadeUp .35s ease}
+  .screen{display:none}.screen.active{display:block;animation:fadeUp .35s ease}
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
-  /* ---- CARDS ---- */
+  /* CARDS */
   .card{background:white;border-radius:24px;padding:24px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.07),0 1px 6px rgba(0,0,0,.04);border:2.5px solid transparent;transition:border-color .3s}
   .card.active-card{border-color:var(--sky)}
   .card-title{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:10px}
   .card-title .icon{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-  .icon-blue{background:#EFF8FF}.icon-yellow{background:#FFFBEF}.icon-purple{background:#F5F0FF}.icon-green{background:#EFFFF9}.icon-orange{background:#FFF7EF}
+  .icon-blue{background:#EFF8FF}.icon-yellow{background:#FFFBEF}.icon-purple{background:#F5F0FF}.icon-green{background:#EFFFF9}.icon-orange{background:#FFF7EF}.icon-coral{background:#FFF0F0}
 
-  /* ---- BUTTONS ---- */
+  /* BUTTONS */
   .btn{font-family:'Fredoka One',cursive;font-size:1.15rem;border:none;border-radius:18px;padding:16px 28px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;letter-spacing:.4px;min-height:54px;touch-action:manipulation}
   .btn:active{transform:scale(.95)}
   .btn-primary{background:linear-gradient(135deg,var(--coral),#FF4F7B);color:white;box-shadow:0 5px 18px rgba(255,107,107,.4);width:100%}
   .btn-secondary{background:linear-gradient(135deg,var(--grass),#00B896);color:white;box-shadow:0 5px 18px rgba(6,214,160,.35);width:100%;margin-top:10px}
   .btn-purple{background:linear-gradient(135deg,var(--purple),#7C3AED);color:white;box-shadow:0 5px 18px rgba(167,139,250,.4);width:100%}
   .btn-sky{background:linear-gradient(135deg,var(--sky),#3BA8E0);color:white;box-shadow:0 5px 18px rgba(110,198,245,.4);width:100%;margin-top:10px}
+  .btn-sun{background:linear-gradient(135deg,var(--sun),#FFA500);color:white;box-shadow:0 5px 18px rgba(255,209,102,.4);width:100%;margin-top:10px}
   .btn-ghost{background:#F0F0F0;color:#888;width:100%;margin-top:10px}
+  .btn-sm{font-size:.9rem;padding:10px 18px;min-height:40px;width:auto}
   .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 
-  /* ---- INSTALL BANNER ---- */
-  .install-banner{background:linear-gradient(135deg,#2D2A3E,#3D3A5E);border-radius:20px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;color:white;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-  .install-banner .ib-icon{font-size:2.2rem;flex-shrink:0}
-  .install-banner .ib-text{flex:1}
-  .install-banner .ib-title{font-family:'Fredoka One',cursive;font-size:1.1rem;margin-bottom:2px}
-  .install-banner .ib-sub{font-size:.82rem;opacity:.75;font-weight:600}
-  .install-banner .ib-btn{background:var(--sun);color:var(--ink);border:none;border-radius:12px;padding:8px 14px;font-family:'Fredoka One',cursive;font-size:.9rem;cursor:pointer;flex-shrink:0;min-height:40px}
-  .install-banner .ib-close{background:none;border:none;color:rgba(255,255,255,.5);font-size:1.2rem;cursor:pointer;padding:4px;min-width:32px;min-height:32px}
+  /* LOGIN */
+  .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-top:calc(var(--safe-top) + 24px);padding-bottom:calc(var(--safe-bottom) + 24px)}
+  .login-card{background:white;border-radius:28px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.12);text-align:center}
+  .login-card .login-emoji{font-size:4rem;display:block;margin-bottom:12px;animation:float 3s ease-in-out infinite}
+  .login-card h2{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--ink);margin-bottom:6px}
+  .login-card p{font-size:.95rem;color:#888;font-weight:600;margin-bottom:24px;line-height:1.5}
+  .login-input{width:100%;padding:16px 18px;border-radius:16px;border:2.5px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:800;color:var(--ink);outline:none;transition:border-color .2s;text-align:center;letter-spacing:2px;text-transform:uppercase;-webkit-appearance:none;background:white}
+  .login-input:focus{border-color:var(--purple)}
+  .login-input::placeholder{letter-spacing:0;text-transform:none;font-weight:600;color:#ccc}
+  .login-error{color:var(--coral);font-weight:800;font-size:.9rem;min-height:22px;margin:10px 0 4px}
 
-  /* ---- STREAK BAR ---- */
+  /* CHILD PICKER */
+  .child-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:8px}
+  .child-card{background:white;border-radius:20px;padding:20px 12px;text-align:center;cursor:pointer;border:2.5px solid #eee;transition:all .2s;box-shadow:0 3px 12px rgba(0,0,0,.06)}
+  .child-card:active{transform:scale(.95)}
+  .child-card.selected,.child-card:hover{border-color:var(--sky);background:linear-gradient(135deg,#F0F8FF,#E8F4FF)}
+  .child-card .child-avatar{font-size:2.8rem;display:block;margin-bottom:8px}
+  .child-card .child-name{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--ink)}
+  .child-card .child-stats{font-size:.75rem;color:#aaa;font-weight:700;margin-top:3px}
+  .add-child-card{background:linear-gradient(135deg,#F5F0FF,#EDE8FF);border:2.5px dashed var(--purple);border-radius:20px;padding:20px 12px;text-align:center;cursor:pointer;transition:all .2s}
+  .add-child-card:active{transform:scale(.95)}
+  .add-child-card .add-icon{font-size:2rem;display:block;margin-bottom:6px;color:var(--purple)}
+  .add-child-card .add-label{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--purple)}
+
+  /* STREAK BAR */
   .streak-bar{display:flex;gap:10px;margin-bottom:14px}
   .streak-chip{flex:1;background:white;border-radius:18px;padding:14px 10px;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.06);border:2px solid transparent}
   .streak-chip .chip-num{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--ink);line-height:1}
   .streak-chip .chip-label{font-size:.72rem;font-weight:800;color:#aaa;margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
-  .streak-chip.hot{border-color:var(--coral);background:linear-gradient(135deg,#FFF5F5,#FFF0F0)}
-  .streak-chip.hot .chip-num{color:var(--coral)}
-  .streak-chip.gold{border-color:var(--sun);background:linear-gradient(135deg,#FFFDF0,#FFFBE8)}
-  .streak-chip.gold .chip-num{color:#D4900A}
+  .streak-chip.hot{border-color:var(--coral);background:linear-gradient(135deg,#FFF5F5,#FFF0F0)}.streak-chip.hot .chip-num{color:var(--coral)}
+  .streak-chip.gold{border-color:var(--sun);background:linear-gradient(135deg,#FFFDF0,#FFFBE8)}.streak-chip.gold .chip-num{color:#D4900A}
 
-  /* ---- BADGES ---- */
+  /* BADGES */
   .badge-row{display:flex;flex-wrap:wrap;gap:8px}
   .badge{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 12px;border-radius:14px;border:2px solid #eee;background:#fafafa;min-width:64px}
   .badge.earned{border-color:var(--sun);background:linear-gradient(135deg,#FFFDF0,#FFF8E0)}
@@ -110,14 +101,14 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   .badge .badge-name{font-size:.68rem;font-weight:800;color:#bbb;text-align:center}
   .badge.earned .badge-name{color:#D4900A}
 
-  /* ---- HISTORY ---- */
+  /* HISTORY */
   .history-list{display:flex;flex-direction:column;gap:8px}
   .history-item{background:linear-gradient(135deg,#F8F8FF,#F0F0FF);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:.92rem;font-weight:700;color:var(--ink)}
   .history-item .h-date{font-size:.75rem;color:#aaa;font-weight:600;white-space:nowrap}
   .history-item .h-idea{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .history-empty{color:#ccc;font-style:italic;font-weight:600;text-align:center;padding:14px 0;font-size:.95rem}
 
-  /* ---- IDEA SCREEN ---- */
+  /* IDEA SCREEN */
   .idea-hero{text-align:center;padding:6px 0 16px}
   .idea-hero .big-emoji{font-size:4rem;display:block;margin-bottom:8px;animation:float 3s ease-in-out infinite}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -134,7 +125,7 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   .idea-input{width:100%;padding:14px 16px;border-radius:14px;border:2px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:var(--ink);outline:none;transition:border-color .2s;background:white;-webkit-appearance:none}
   .idea-input:focus{border-color:var(--sky)}
 
-  /* ---- LOADING ---- */
+  /* LOADING */
   .loading-screen{text-align:center;padding:36px 16px}
   .loading-screen h2{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--ink);margin-bottom:8px}
   .loading-idea-text{color:#888;font-weight:700;font-size:.95rem;margin-bottom:24px;font-style:italic}
@@ -146,12 +137,14 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   @keyframes dot-pop{0%,80%,100%{transform:scale(.7);opacity:.5}40%{transform:scale(1.2);opacity:1}}
   .loading-msg{font-size:.95rem;color:#aaa;font-style:italic}
 
-  /* ---- READING ---- */
+  /* READING */
   .story-box{background:linear-gradient(135deg,#FFFBF0,#FFF8E8);border:2px dashed #FFD166;border-radius:16px;padding:20px;line-height:2.1;font-size:1.15rem;font-weight:600;min-height:80px;color:var(--ink)}
   .word{display:inline;padding:2px 2px;border-radius:5px;transition:all .2s ease}
   .word.read{background:#DCFCE7;color:#166534}
   .word.current{background:var(--sun);color:var(--ink);border-radius:7px;box-shadow:0 2px 6px rgba(255,209,102,.6);animation:bounce-word .35s ease}
   @keyframes bounce-word{0%{transform:scale(1)}50%{transform:scale(1.14)}100%{transform:scale(1)}}
+  .word.speaking{background:var(--sky)!important;color:white!important;box-shadow:0 2px 10px rgba(110,198,245,.7)!important;animation:speak-pulse .6s ease-in-out!important}
+  @keyframes speak-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
   .progress-wrap{background:#F0F0F0;border-radius:20px;height:12px;margin:16px 0 5px;overflow:hidden}
   .progress-bar{height:100%;background:linear-gradient(90deg,var(--grass),var(--sky));border-radius:20px;width:0%;transition:width .4s ease}
   .progress-label{font-size:.82rem;font-weight:700;color:#aaa;text-align:right}
@@ -164,19 +157,31 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   .prize-display{background:linear-gradient(135deg,#FFF0FF,#F0F0FF);border:2px solid var(--purple);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;font-size:1rem;font-weight:800;color:#5B21B6}
   .prize-emoji-display{font-size:1.9rem}
 
-  /* ---- PARENT SETTINGS ---- */
+  /* PARENT SETTINGS */
   .setting-row{margin-bottom:20px}
   .setting-label{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--ink);margin-bottom:9px;display:flex;align-items:center;gap:7px}
   .option-group{display:flex;flex-wrap:wrap;gap:8px}
   .option-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;padding:10px 16px;border-radius:12px;border:2px solid #e0e0e0;background:white;cursor:pointer;transition:all .15s;color:#666;min-height:44px;touch-action:manipulation}
   .option-btn:active{transform:scale(.95)}
   .option-btn.selected{border-color:var(--purple);background:linear-gradient(135deg,#F5F0FF,#EDE8FF);color:#5B21B6}
-  .setting-input{width:100%;padding:14px 16px;border-radius:14px;border:2px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:var(--ink);outline:none;transition:border-color .2s;-webkit-appearance:none}
+  .setting-input{width:100%;padding:14px 16px;border-radius:14px;border:2px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:var(--ink);outline:none;transition:border-color .2s;-webkit-appearance:none;background:white}
   .setting-input:focus{border-color:var(--purple)}
   .prize-preview{background:linear-gradient(135deg,#FFF0FF,#F0F0FF);border:2px solid var(--purple);border-radius:14px;padding:12px 16px;font-weight:800;color:#5B21B6;margin-top:8px;font-size:.95rem;min-height:42px}
 
-  /* ---- PIN MODAL ---- */
-  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px;padding-bottom:max(20px, var(--safe-bottom))}
+  /* DASHBOARD */
+  .dash-child-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #f0f0f0}
+  .dash-child-row:last-child{border-bottom:none}
+  .dash-avatar{font-size:2rem;flex-shrink:0}
+  .dash-info{flex:1}
+  .dash-name{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--ink)}
+  .dash-stats{font-size:.8rem;font-weight:700;color:#aaa;margin-top:2px}
+  .dash-badges{display:flex;gap:4px;margin-top:6px}
+  .dash-badge{font-size:1.1rem;filter:grayscale(1);opacity:.25}
+  .dash-badge.earned{filter:none;opacity:1}
+  .dash-streak{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--coral)}
+
+  /* PIN MODAL */
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px;padding-bottom:max(20px,var(--safe-bottom))}
   .modal.show{display:flex;animation:fadeIn .25s ease}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   .modal-card{background:white;border-radius:28px;padding:32px 28px;text-align:center;max-width:340px;width:100%;animation:slideUp .3s cubic-bezier(.34,1.4,.64,1);box-shadow:0 20px 60px rgba(0,0,0,.25)}
@@ -193,13 +198,21 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   .pin-key:active{transform:scale(.9);background:#E0E0E0}
   .pin-error-msg{color:var(--coral);font-weight:800;font-size:.88rem;min-height:20px;margin-bottom:8px}
 
-  /* ---- BADGE MODAL ---- */
+  /* ADD CHILD MODAL */
+  .add-child-modal-card{background:white;border-radius:28px;padding:32px 28px;text-align:center;max-width:360px;width:100%;animation:slideUp .3s cubic-bezier(.34,1.4,.64,1);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  .add-child-modal-card h3{font-family:'Fredoka One',cursive;font-size:1.55rem;color:var(--ink);margin-bottom:16px}
+  .avatar-picker{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px}
+  .avatar-opt{font-size:1.8rem;padding:8px;border-radius:12px;border:2.5px solid transparent;cursor:pointer;transition:all .15s;background:#f5f5f5}
+  .avatar-opt.selected{border-color:var(--purple);background:linear-gradient(135deg,#F5F0FF,#EDE8FF)}
+  .avatar-opt:active{transform:scale(.9)}
+
+  /* BADGE MODAL */
   .badge-modal-card{background:white;border-radius:28px;padding:38px 28px;text-align:center;max-width:320px;width:100%;animation:slideUp .4s cubic-bezier(.34,1.4,.64,1);box-shadow:0 20px 60px rgba(0,0,0,.25)}
   .badge-modal-card .bm-icon{font-size:4.5rem;display:block;margin-bottom:10px}
   .badge-modal-card h3{font-family:'Fredoka One',cursive;font-size:1.7rem;color:var(--ink);margin-bottom:5px}
   .badge-modal-card p{color:#888;font-weight:700;font-size:.95rem}
 
-  /* ---- CELEBRATION ---- */
+  /* CELEBRATION */
   .celebration{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:flex-end;justify-content:center;padding-bottom:var(--safe-bottom)}
   .celebration.show{display:flex;animation:fadeIn .3s ease}
   .celebrate-card{background:white;border-radius:28px 28px 0 0;padding:36px 28px calc(28px + var(--safe-bottom));text-align:center;width:100%;max-width:600px;animation:slideUp .4s cubic-bezier(.34,1.2,.64,1);box-shadow:0 -10px 40px rgba(0,0,0,.15)}
@@ -209,35 +222,14 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   .prize-reveal{background:linear-gradient(135deg,var(--sun),#FFA500);border-radius:14px;padding:11px 16px;font-size:1.15rem;font-weight:800;color:white;margin:12px 0 18px;box-shadow:0 5px 18px rgba(255,165,0,.4)}
   .streak-reveal{background:linear-gradient(135deg,var(--coral),#FF4F7B);border-radius:12px;padding:9px 14px;font-size:.95rem;font-weight:800;color:white;margin-bottom:8px}
 
-  /* ---- STARS ---- */
   .stars{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;overflow:hidden}
   .star{position:absolute;color:var(--sun);opacity:.12;animation:twinkle 3s ease-in-out infinite}
   @keyframes twinkle{0%,100%{opacity:.08;transform:scale(1)}50%{opacity:.25;transform:scale(1.3)}}
 
-  /* ---- LOGIN SCREEN ---- */
-  .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-top:calc(var(--safe-top) + 24px);padding-bottom:calc(var(--safe-bottom) + 24px)}
-  .login-card{background:white;border-radius:28px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.12);text-align:center}
-  .login-card .login-emoji{font-size:4rem;display:block;margin-bottom:12px;animation:float 3s ease-in-out infinite}
-  .login-card h2{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--ink);margin-bottom:6px}
-  .login-card p{font-size:.95rem;color:#888;font-weight:600;margin-bottom:24px;line-height:1.5}
-  .login-input{width:100%;padding:16px 18px;border-radius:16px;border:2.5px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:800;color:var(--ink);outline:none;transition:border-color .2s;text-align:center;letter-spacing:2px;text-transform:uppercase;-webkit-appearance:none}
-  .login-input:focus{border-color:var(--purple)}
-  .login-input::placeholder{letter-spacing:0;text-transform:none;font-weight:600;color:#ccc}
-  .login-error{color:var(--coral);font-weight:800;font-size:.9rem;min-height:22px;margin:10px 0 4px}
-  .word.speaking{background:var(--sky)!important;color:white!important;box-shadow:0 2px 10px rgba(110,198,245,.7)!important;animation:speak-pulse .6s ease-in-out!important}
-  @keyframes speak-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+  .spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ---- RESPONSIVE ---- */
-  @media(min-width:480px){
-    .container{padding:24px 24px 100px}
-    .header h1{font-size:3rem}
-    .story-box{font-size:1.2rem}
-    .card{padding:28px}
-  }
-  @media(min-width:600px){
-    .streak-bar{gap:14px}
-    .streak-chip .chip-num{font-size:2.2rem}
-  }
+  @media(min-width:480px){.container{padding:24px 24px 100px}.header h1{font-size:3rem}.story-box{font-size:1.2rem}.card{padding:28px}}
 </style>
 </head>
 <body>
@@ -250,10 +242,7 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" style="display:none">
-  <div class="sky">
-    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
-    <div class="sun-icon"></div>
-  </div>
+  <div class="sky"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="sun-icon"></div></div>
   <div class="login-wrap">
     <div class="login-card">
       <span class="login-emoji">📚</span>
@@ -264,75 +253,60 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
         oninput="this.value=this.value.toUpperCase()"
         onkeydown="if(event.key==='Enter')submitCode()" />
       <div class="login-error" id="loginError"></div>
-      <button class="btn btn-purple" onclick="submitCode()" style="width:100%;margin-top:4px">Let's Read! ✨</button>
+      <button class="btn btn-purple" onclick="submitCode()" style="width:100%;margin-top:4px">Lets Read! ✨</button>
     </div>
   </div>
 </div>
 
-<div class="container" id="mainApp" style="display:none">
+<div id="mainApp" style="display:none">
+<div class="container">
   <div class="header">
     <h1>⭐ Story Reader</h1>
-    <p>Your story, your adventure!</p>
+    <p id="headerSub">Your story, your adventure!</p>
     <button class="parent-btn" onclick="openParentGate()" title="Parent Settings">⚙️</button>
   </div>
 
-  <!-- SCREEN 1: IDEA -->
-  <div class="screen active" id="screenIdea">
-
-    <!-- Install banner (shown only when installable) -->
-    <div class="install-banner" id="installBanner" style="display:none">
-      <span class="ib-icon">📲</span>
-      <div class="ib-text">
-        <div class="ib-title">Add to Home Screen</div>
-        <div class="ib-sub">Launch like a real app  -  no browser bar!</div>
-      </div>
-      <button class="ib-btn" onclick="installApp()">Install</button>
-      <button class="ib-close" onclick="dismissInstall()">✕</button>
+  <!-- SCREEN: CHILD PICKER -->
+  <div class="screen active" id="screenPicker">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-yellow">👋</div>Who is reading today?</div>
+      <div class="child-grid" id="childGrid"></div>
     </div>
+  </div>
 
-    <!-- Streak bar -->
+  <!-- SCREEN: IDEA -->
+  <div class="screen" id="screenIdea">
     <div class="streak-bar">
-      <div class="streak-chip hot" id="streakChip">
-        <div class="chip-num" id="streakNum">0</div>
-        <div class="chip-label">🔥 Day Streak</div>
-      </div>
-      <div class="streak-chip gold" id="totalChip">
-        <div class="chip-num" id="totalNum">0</div>
-        <div class="chip-label">📚 Stories Read</div>
-      </div>
+      <div class="streak-chip hot"><div class="chip-num" id="streakNum">0</div><div class="chip-label">🔥 Day Streak</div></div>
+      <div class="streak-chip gold"><div class="chip-num" id="totalNum">0</div><div class="chip-label">📚 Stories Read</div></div>
     </div>
-
     <div class="card active-card">
       <div class="idea-hero">
         <span class="big-emoji">🎙️</span>
         <h2>What's your story about?</h2>
         <p>Press the mic button and talk about what you want your story to be!</p>
       </div>
-      <p class="mic-hint" id="ideaMicHint">Tap the mic to start  -  tap again when you're done!</p>
+      <p class="mic-hint" id="ideaMicHint">Tap the mic to start - tap again when done!</p>
       <button class="mic-big-btn" id="ideaMicBtn" onclick="toggleIdeaRecording()">🎤</button>
       <div class="idea-heard empty" id="ideaHeard">Your idea will appear here...</div>
-      <div class="divider"> -  or type your idea instead  - </div>
+      <div class="divider">- or type your idea instead -</div>
       <input class="idea-input" type="text" id="ideaTyped" placeholder="e.g. a dragon who loves to bake cookies..." oninput="handleTypedIdea()" autocomplete="off" autocorrect="off" autocapitalize="sentences" />
       <button class="btn btn-purple" id="makeStoryBtn" onclick="generateStory()" disabled style="margin-top:16px">✨ Make my story!</button>
       <button class="btn btn-ghost" onclick="clearIdea()">🔄 Try again</button>
     </div>
-
-    <!-- Trophies -->
     <div class="card">
       <div class="card-title"><div class="icon icon-orange">🏆</div>Trophy Shelf</div>
       <div class="badge-row" id="badgeRow"></div>
     </div>
-
-    <!-- History -->
     <div class="card">
       <div class="card-title"><div class="icon icon-green">📜</div>Reading History</div>
       <div class="history-list" id="historyList"></div>
     </div>
-
-    <p style="text-align:center;color:#ccc;font-size:.78rem;margin-top:4px;padding-bottom:8px">💡 Works best in <strong>Google Chrome</strong> on Android, or <strong>Safari</strong> on iPhone</p>
+    <button class="btn btn-ghost" onclick="showScreen('screenPicker');loadChildPicker()" style="margin-bottom:8px">👈 Switch Reader</button>
+    <p style="text-align:center;color:#ccc;font-size:.78rem;margin-top:4px">💡 Works best in Chrome (Android) or Safari (iPhone)</p>
   </div>
 
-  <!-- SCREEN 2: LOADING -->
+  <!-- SCREEN: LOADING -->
   <div class="screen" id="screenLoading">
     <div class="card">
       <div class="loading-screen">
@@ -345,7 +319,7 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
     </div>
   </div>
 
-  <!-- SCREEN 3: READING -->
+  <!-- SCREEN: READING -->
   <div class="screen" id="screenReading">
     <div class="card active-card">
       <div class="card-title"><div class="icon icon-yellow">📖</div><span id="storyTitle">Your Story</span></div>
@@ -367,49 +341,56 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
         <div>Finish reading to earn: <strong id="prizeText">an ice cream cone!</strong></div>
       </div>
     </div>
-    <div class="card">
-      <button class="btn btn-ghost" onclick="goToIdeaScreen()">← New Story Idea</button>
-    </div>
+    <div class="card"><button class="btn btn-ghost" onclick="goToIdeaScreen()">← New Story Idea</button></div>
   </div>
 
-  <!-- SCREEN 4: PARENT SETTINGS -->
+  <!-- SCREEN: PARENT SETTINGS -->
   <div class="screen" id="screenParent">
     <div class="card">
-      <div class="card-title"><div class="icon icon-purple">⚙️</div>Parent Settings</div>
-      <div class="setting-row">
-        <div class="setting-label">📚 Reading Level</div>
-        <div class="option-group" id="levelOptions">
-          <button class="option-btn" onclick="selectOption('level','1st grade',this)">1st Grade</button>
-          <button class="option-btn" onclick="selectOption('level','2nd grade',this)">2nd Grade</button>
-          <button class="option-btn selected" onclick="selectOption('level','3rd grade',this)">3rd Grade</button>
-          <button class="option-btn" onclick="selectOption('level','4th grade',this)">4th Grade</button>
-          <button class="option-btn" onclick="selectOption('level','5th grade',this)">5th Grade</button>
-        </div>
-      </div>
-      <div class="setting-row">
-        <div class="setting-label">⏱️ Reading Time</div>
-        <div class="option-group" id="lengthOptions">
-          <button class="option-btn" onclick="selectOption('length','short',this)">5 minutes</button>
-          <button class="option-btn selected" onclick="selectOption('length','medium',this)">10 minutes</button>
-          <button class="option-btn" onclick="selectOption('length','long',this)">15 minutes</button>
-        </div>
-      </div>
-      <div class="setting-row">
-        <div class="setting-label">🎁 Prize</div>
-        <input class="setting-input" type="text" id="prizeInput" placeholder="e.g. 30 minutes of Minecraft, a cookie..." oninput="updatePrizePreview()" autocomplete="off" />
-        <div class="prize-preview" id="prizePreview">🎁 Prize will show here</div>
-      </div>
-      <div class="setting-row">
-        <div class="setting-label">🔒 Parent PIN <span style="font-size:.78rem;color:#aaa;font-family:'Nunito',sans-serif;font-weight:600">(4 digits)</span></div>
-        <input class="setting-input" type="password" id="pinInput" placeholder="Enter a new 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" />
-        <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN. Default is 1234.</p>
-      </div>
-      <button class="btn btn-purple" onclick="saveSettings()">💾 Save Settings</button>
-      <button class="btn btn-sky" onclick="showScreen('screenIdea')">← Back to App</button>
+      <div class="card-title"><div class="icon icon-purple">📊</div>Parent Dashboard</div>
+      <div id="dashboardContent"><div style="text-align:center;color:#ccc;padding:20px">Loading...</div></div>
     </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-purple">⚙️</div>Settings</div>
+      <p style="font-size:.85rem;color:#aaa;font-weight:600;margin-bottom:16px">Select a child to edit their settings</p>
+      <div class="option-group" id="settingsChildPicker" style="margin-bottom:16px"></div>
+      <div id="childSettingsForm">
+        <div class="setting-row">
+          <div class="setting-label">📚 Reading Level</div>
+          <div class="option-group" id="levelOptions">
+            <button class="option-btn" onclick="selectOption('level','1st grade',this)">1st Grade</button>
+            <button class="option-btn" onclick="selectOption('level','2nd grade',this)">2nd Grade</button>
+            <button class="option-btn selected" onclick="selectOption('level','3rd grade',this)">3rd Grade</button>
+            <button class="option-btn" onclick="selectOption('level','4th grade',this)">4th Grade</button>
+            <button class="option-btn" onclick="selectOption('level','5th grade',this)">5th Grade</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">⏱️ Reading Time</div>
+          <div class="option-group" id="lengthOptions">
+            <button class="option-btn" onclick="selectOption('length','short',this)">5 minutes</button>
+            <button class="option-btn selected" onclick="selectOption('length','medium',this)">10 minutes</button>
+            <button class="option-btn" onclick="selectOption('length','long',this)">15 minutes</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">🎁 Prize</div>
+          <input class="setting-input" type="text" id="prizeInput" placeholder="e.g. 30 minutes of Minecraft..." oninput="updatePrizePreview()" autocomplete="off" />
+          <div class="prize-preview" id="prizePreview">🎁 Prize will show here</div>
+        </div>
+        <button class="btn btn-purple" onclick="saveChildSettings()">💾 Save Child Settings</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-coral">🔒</div>Parent PIN</div>
+      <input class="setting-input" type="password" id="pinInput" placeholder="Enter a new 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" />
+      <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN. Default is 1234.</p>
+      <button class="btn btn-sky" onclick="savePin()" style="margin-top:12px">Save PIN</button>
+    </div>
+    <button class="btn btn-ghost" onclick="showScreen('screenPicker');loadChildPicker()">← Back to App</button>
   </div>
-</div>
 
+</div><!-- end container -->
 </div><!-- end mainApp -->
 
 <!-- PIN MODAL -->
@@ -423,19 +404,23 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
     </div>
     <div class="pin-error-msg" id="pinErrorMsg"></div>
     <div class="pin-pad">
-      <button class="pin-key" onclick="pinPress('1')">1</button>
-      <button class="pin-key" onclick="pinPress('2')">2</button>
-      <button class="pin-key" onclick="pinPress('3')">3</button>
-      <button class="pin-key" onclick="pinPress('4')">4</button>
-      <button class="pin-key" onclick="pinPress('5')">5</button>
-      <button class="pin-key" onclick="pinPress('6')">6</button>
-      <button class="pin-key" onclick="pinPress('7')">7</button>
-      <button class="pin-key" onclick="pinPress('8')">8</button>
-      <button class="pin-key" onclick="pinPress('9')">9</button>
-      <button class="pin-key" onclick="pinPress('0')">0</button>
-      <button class="pin-key" onclick="pinBackspace()">⌫</button>
+      <button class="pin-key" onclick="pinPress('1')">1</button><button class="pin-key" onclick="pinPress('2')">2</button><button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button><button class="pin-key" onclick="pinPress('5')">5</button><button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button><button class="pin-key" onclick="pinPress('8')">8</button><button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button><button class="pin-key" onclick="pinBackspace()">⌫</button>
     </div>
     <button class="btn btn-ghost" onclick="closePinModal()" style="font-size:1rem;padding:14px">Cancel</button>
+  </div>
+</div>
+
+<!-- ADD CHILD MODAL -->
+<div class="modal" id="addChildModal">
+  <div class="add-child-modal-card">
+    <h3>➕ Add a Reader</h3>
+    <div class="avatar-picker" id="avatarPicker"></div>
+    <input class="setting-input" type="text" id="newChildName" placeholder="Child's name" autocomplete="off" autocapitalize="words" style="margin-bottom:14px" />
+    <button class="btn btn-purple" onclick="saveNewChild()">Add Reader ✨</button>
+    <button class="btn btn-ghost" onclick="closeAddChildModal()" style="font-size:1rem;padding:14px">Cancel</button>
   </div>
 </div>
 
@@ -449,11 +434,11 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   </div>
 </div>
 
-<!-- CELEBRATION (slides up from bottom like a native sheet) -->
+<!-- CELEBRATION -->
 <div class="celebration" id="celebration">
   <div class="celebrate-card">
     <span class="cel-emoji">🎉</span>
-    <h2>Amazing job!</h2>
+    <h2 id="celebName">Amazing job!</h2>
     <p>You read the whole story!</p>
     <div class="streak-reveal" id="streakReveal">🌟 Story complete!</div>
     <div class="prize-reveal" id="prizeReveal">🍦 You earned: an ice cream cone!</div>
@@ -464,149 +449,77 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
 
 <script>
 // ============================================================
-// LOGIN
+// SUPABASE CONFIG
 // ============================================================
-const VALID_CODES=['VERSION123','RISHI123','JACK123','STRIPE123'];
+const SUPA_URL='https://scsgvyhqvbjdbyqgdaqj.supabase.co';
+const SUPA_KEY='sb_publishable_IZa375ss-5YzVikrGKmZbA_-Fyue7Gl';
 
-function checkLogin(){
-  try{
-    const saved=localStorage.getItem('sr_code');
-    if(saved && VALID_CODES.includes(saved)){
-      showApp();
-    } else {
-      document.getElementById('loginScreen').style.display='block';
-    }
-  } catch(e){
-    document.getElementById('loginScreen').style.display='block';
+async function supa(method, path, body){
+  const res = await fetch(SUPA_URL+'/rest/v1/'+path, {
+    method,
+    headers:{
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer '+SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method==='POST' ? 'return=representation' : ''
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(!res.ok){
+    const err = await res.text();
+    throw new Error(err);
   }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
-
-function submitCode(){
-  const val=document.getElementById('codeInput').value.trim().toUpperCase();
-  if(VALID_CODES.includes(val)){
-    try{localStorage.setItem('sr_code',val);}catch(e){}
-    document.getElementById('loginError').textContent='';
-    showApp();
-  } else {
-    document.getElementById('loginError').textContent='Hmm, that code doesn't match  -  try again!';
-    document.getElementById('codeInput').select();
-  }
-}
-
-function showApp(){
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('mainApp').style.display='block';
-}
-
-// ============================================================
-// SETTINGS
-// ============================================================
-const DEFAULT_SETTINGS={readingLevel:'3rd grade',storyLength:'medium',prize:'an ice cream cone!',prizeEmoji:'🍦',pin:'1234'};
-let settings={...DEFAULT_SETTINGS};
-function loadSettings(){try{const s=localStorage.getItem('sr_settings');if(s)settings={...DEFAULT_SETTINGS,...JSON.parse(s)};}catch(e){}}
-function saveSettingsToStorage(){try{localStorage.setItem('sr_settings',JSON.stringify(settings));}catch(e){}}
-
-// ============================================================
-// STATS
-// ============================================================
-const DEFAULT_STATS={totalStories:0,streak:0,lastReadDate:null,history:[]};
-let stats={...DEFAULT_STATS};
-function loadStats(){try{const s=localStorage.getItem('sr_stats');if(s)stats={...DEFAULT_STATS,...JSON.parse(s)};}catch(e){}}
-function saveStats(){try{localStorage.setItem('sr_stats',JSON.stringify(stats));}catch(e){}}
-
-function recordStoryFinished(ideaText){
-  const today=new Date().toDateString();
-  const yesterday=new Date(Date.now()-86400000).toDateString();
-  if(stats.lastReadDate===today){}
-  else if(stats.lastReadDate===yesterday)stats.streak++;
-  else stats.streak=1;
-  stats.lastReadDate=today;
-  stats.totalStories++;
-  stats.history.unshift({idea:ideaText,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
-  if(stats.history.length>10)stats.history=stats.history.slice(0,10);
-  saveStats();updateStatsUI();
-  checkNewBadge(stats.totalStories);
-}
-
-// ============================================================
-// BADGES
-// ============================================================
-const BADGES=[
-  {count:1, icon:'⭐',name:'First Story!',desc:"You read your very first story!"},
-  {count:5, icon:'🥉',name:'5 Stories!', desc:"You've read 5 whole stories!"},
-  {count:10,icon:'🥈',name:'10 Stories!',desc:"10 stories  -  you're a real reader!"},
-  {count:25,icon:'🥇',name:'25 Stories!',desc:"25 stories  -  reading superstar!"},
-  {count:50,icon:'🏆',name:'50 Stories!',desc:"50 stories  -  you're a legend!"},
-];
-
-function checkNewBadge(total){
-  const badge=BADGES.find(b=>b.count===total);
-  if(badge){setTimeout(()=>{document.getElementById('badgeModalIcon').textContent=badge.icon;document.getElementById('badgeModalTitle').textContent=badge.name;document.getElementById('badgeModalDesc').textContent=badge.desc;document.getElementById('badgeModal').classList.add('show');},2200);}
-}
-function closeBadgeModal(){document.getElementById('badgeModal').classList.remove('show');}
-
-function renderBadges(){
-  document.getElementById('badgeRow').innerHTML=BADGES.map(b=>{
-    const earned=stats.totalStories>=b.count;
-    return `<div class="badge ${earned?'earned':''}"><span class="badge-icon">${b.icon}</span><span class="badge-name">${b.name}</span></div>`;
-  }).join('');
-}
-
-function renderHistory(){
-  const list=document.getElementById('historyList');
-  if(!stats.history.length){list.innerHTML='<div class="history-empty">No stories yet  -  read one to get started!</div>';return;}
-  list.innerHTML=stats.history.map(h=>`<div class="history-item"><span>📖</span><span class="h-idea">${h.idea}</span><span class="h-date">${h.date}</span></div>`).join('');
-}
-
-function updateStatsUI(){
-  document.getElementById('streakNum').textContent=stats.streak;
-  document.getElementById('totalNum').textContent=stats.totalStories;
-  renderBadges();renderHistory();
-}
-
-// ============================================================
-// PWA INSTALL
-// ============================================================
-let deferredInstallPrompt=null;
-
-window.addEventListener('beforeinstallprompt',(e)=>{
-  e.preventDefault();
-  deferredInstallPrompt=e;
-  // Show banner only if not already installed
-  if(!window.matchMedia('(display-mode: standalone)').matches){
-    document.getElementById('installBanner').style.display='flex';
-  }
-});
-
-async function installApp(){
-  if(!deferredInstallPrompt)return;
-  deferredInstallPrompt.prompt();
-  const result=await deferredInstallPrompt.userChoice;
-  if(result.outcome==='accepted')dismissInstall();
-  deferredInstallPrompt=null;
-}
-
-function dismissInstall(){
-  document.getElementById('installBanner').style.display='none';
-  try{localStorage.setItem('sr_install_dismissed','1');}catch(e){}
-}
-
-// Hide banner if already dismissed
-try{if(localStorage.getItem('sr_install_dismissed'))document.getElementById('installBanner').style.display='none';}catch(e){}
-
-// ============================================================
-// WPM / WORD COUNT
-// ============================================================
-const WPM={'1st grade':60,'2nd grade':90,'3rd grade':110,'4th grade':130,'5th grade':150};
-const MINUTES={short:5,medium:10,long:15};
-function getWordCount(){const wpm=WPM[settings.readingLevel]||110;const mins=MINUTES[settings.storyLength]||10;const t=wpm*mins;return`${Math.round(t*.9)}-${Math.round(t*1.1)}`;}
 
 // ============================================================
 // STATE
 // ============================================================
+let familyId = null;
+let currentChild = null;   // {id, name, avatar, reading_level, story_length, prize}
+let childStats = null;     // {id, streak, total_stories, last_read_date}
+let childHistory = [];
+let allChildren = [];
+
 let words=[],wordIndex=0,recognition=null,isListening=false,isPaused=false;
 let ideaText='',ideaRecognition=null,ideaRecording=false;
 let pinEntry='',currentIdeaForHistory='';
+let parentPin='1234';
+
+const BADGES=[
+  {count:1, icon:'⭐',name:'First Story!', desc:'You read your very first story!'},
+  {count:5, icon:'🥉',name:'5 Stories!',  desc:"You've read 5 whole stories!"},
+  {count:10,icon:'🥈',name:'10 Stories!', desc:"10 stories - you're a real reader!"},
+  {count:25,icon:'🥇',name:'25 Stories!', desc:'25 stories - reading superstar!'},
+  {count:50,icon:'🏆',name:'50 Stories!', desc:"50 stories - you're a legend!"},
+];
+
+const WPM={'1st grade':60,'2nd grade':90,'3rd grade':110,'4th grade':130,'5th grade':150};
+const MINUTES={short:5,medium:10,long:15};
+const AVATARS=['🦁','🐯','🐼','🦊','🐸','🦄','🐙','🦋','🐲','⭐','🚀','🌈'];
+
+function getWordCount(){
+  const wpm=WPM[currentChild.reading_level]||110;
+  const mins=MINUTES[currentChild.story_length]||10;
+  const t=wpm*mins;
+  return `${Math.round(t*.9)}-${Math.round(t*1.1)}`;
+}
+
+// PIN stored in localStorage per family
+function loadPin(){
+  try{parentPin=localStorage.getItem('sr_pin_'+familyId)||'1234';}catch(e){}
+}
+function savePin(){
+  const pn=document.getElementById('pinInput').value.trim();
+  if(!pn){alert('Please enter a PIN');return;}
+  if(pn.length!==4||!/^\d{4}$/.test(pn)){alert('PIN must be exactly 4 numbers!');return;}
+  parentPin=pn;
+  try{localStorage.setItem('sr_pin_'+familyId,pn);}catch(e){}
+  const btn=document.querySelector('#screenParent .btn-sky');
+  const orig=btn.textContent;btn.textContent='✅ Saved!';
+  setTimeout(()=>btn.textContent=orig,1500);
+}
 
 // ============================================================
 // SCREENS
@@ -618,17 +531,204 @@ function showScreen(id){
 }
 
 // ============================================================
-// STARS
+// LOGIN
 // ============================================================
-function initStars(){
-  const c=document.getElementById('starsContainer');
-  for(let i=0;i<18;i++){const s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${.6+Math.random()*.7}rem`;c.appendChild(s);}
+async function checkLogin(){
+  try{
+    const saved=localStorage.getItem('sr_family_code');
+    if(saved) await loginWithCode(saved,true);
+    else showLoginScreen();
+  }catch(e){showLoginScreen();}
+}
+
+function showLoginScreen(){
+  document.getElementById('loginScreen').style.display='block';
+  document.getElementById('mainApp').style.display='none';
+}
+
+async function submitCode(){
+  const val=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(!val){document.getElementById('loginError').textContent='Please enter your family code!';return;}
+  const btn=document.querySelector('#loginScreen .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Checking...';
+  btn.disabled=true;
+  try{
+    await loginWithCode(val,false);
+  }catch(e){
+    document.getElementById('loginError').textContent='Hmm, that code doesnt match - try again!';
+    btn.innerHTML='Lets Read! ✨';
+    btn.disabled=false;
+  }
+}
+
+async function loginWithCode(code, silent){
+  const rows = await supa('GET','families?code=eq.'+code+'&select=id');
+  if(!rows||rows.length===0) throw new Error('Invalid code');
+  familyId = rows[0].id;
+  try{localStorage.setItem('sr_family_code',code);}catch(e){}
+  loadPin();
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  await loadChildPicker();
 }
 
 // ============================================================
-// MIC
+// CHILD PICKER
 // ============================================================
-async function warmUpMic(){try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());}catch(e){}}
+async function loadChildPicker(){
+  showScreen('screenPicker');
+  document.getElementById('childGrid').innerHTML='<div style="text-align:center;color:#ccc;padding:20px;grid-column:span 2">Loading...</div>';
+  allChildren = await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
+
+  // Load stats for all children
+  const statsRows = allChildren.length > 0
+    ? await supa('GET','reading_stats?child_id=in.('+allChildren.map(c=>c.id).join(',')+')'+'&select=*')
+    : [];
+
+  const grid = document.getElementById('childGrid');
+  grid.innerHTML='';
+
+  allChildren.forEach(child=>{
+    const st = statsRows.find(s=>s.child_id===child.id)||{streak:0,total_stories:0};
+    const div=document.createElement('div');
+    div.className='child-card';
+    div.innerHTML=`<span class="child-avatar">${child.avatar}</span><div class="child-name">${child.name}</div><div class="child-stats">📚 ${st.total_stories} stories &nbsp; 🔥 ${st.streak} day streak</div>`;
+    div.onclick=()=>selectChild(child);
+    grid.appendChild(div);
+  });
+
+  // Add child button
+  const add=document.createElement('div');
+  add.className='add-child-card';
+  add.innerHTML='<span class="add-icon">➕</span><div class="add-label">Add Reader</div>';
+  add.onclick=openAddChildModal;
+  grid.appendChild(add);
+}
+
+async function selectChild(child){
+  currentChild=child;
+  document.getElementById('headerSub').textContent='Reading as '+child.name+' '+child.avatar;
+
+  // Load stats
+  const rows=await supa('GET','reading_stats?child_id=eq.'+child.id+'&select=*');
+  if(rows&&rows.length>0){childStats=rows[0];}
+  else{
+    const created=await supa('POST','reading_stats',[{child_id:child.id,streak:0,total_stories:0,last_read_date:null}]);
+    childStats=created[0];
+  }
+
+  // Load history
+  const hist=await supa('GET','stories?child_id=eq.'+child.id+'&select=*&order=read_at.desc&limit=10');
+  childHistory=hist||[];
+
+  updateStatsUI();
+  showScreen('screenIdea');
+}
+
+// ============================================================
+// ADD CHILD MODAL
+// ============================================================
+let selectedAvatar=AVATARS[0];
+
+function openAddChildModal(){
+  selectedAvatar=AVATARS[0];
+  document.getElementById('newChildName').value='';
+  const picker=document.getElementById('avatarPicker');
+  picker.innerHTML=AVATARS.map((a,i)=>`<button class="avatar-opt${i===0?' selected':''}" onclick="pickAvatar('${a}',this)">${a}</button>`).join('');
+  document.getElementById('addChildModal').classList.add('show');
+}
+
+function pickAvatar(a,el){
+  selectedAvatar=a;
+  document.querySelectorAll('.avatar-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function closeAddChildModal(){document.getElementById('addChildModal').classList.remove('show');}
+
+async function saveNewChild(){
+  const name=document.getElementById('newChildName').value.trim();
+  if(!name){alert('Please enter a name!');return;}
+  const btn=document.querySelector('#addChildModal .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Saving...';btn.disabled=true;
+  try{
+    const created=await supa('POST','children',[{family_id:familyId,name,avatar:selectedAvatar,reading_level:'3rd grade',story_length:'medium',prize:'an ice cream cone!'}]);
+    closeAddChildModal();
+    btn.innerHTML='Add Reader ✨';btn.disabled=false;
+    await loadChildPicker();
+  }catch(e){
+    alert('Something went wrong, please try again');
+    btn.innerHTML='Add Reader ✨';btn.disabled=false;
+  }
+}
+
+// ============================================================
+// STATS UI
+// ============================================================
+function updateStatsUI(){
+  if(!childStats)return;
+  document.getElementById('streakNum').textContent=childStats.streak||0;
+  document.getElementById('totalNum').textContent=childStats.total_stories||0;
+  renderBadges();
+  renderHistory();
+}
+
+function renderBadges(){
+  const total=childStats?childStats.total_stories:0;
+  document.getElementById('badgeRow').innerHTML=BADGES.map(b=>`
+    <div class="badge ${total>=b.count?'earned':''}">
+      <span class="badge-icon">${b.icon}</span>
+      <span class="badge-name">${b.name}</span>
+    </div>`).join('');
+}
+
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  if(!childHistory.length){list.innerHTML='<div class="history-empty">No stories yet - read one to get started!</div>';return;}
+  list.innerHTML=childHistory.map(h=>`
+    <div class="history-item">
+      <span>📖</span>
+      <span class="h-idea">${h.idea}</span>
+      <span class="h-date">${new Date(h.read_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+    </div>`).join('');
+}
+
+async function recordStoryFinished(idea){
+  if(!childStats||!currentChild)return;
+  const today=new Date().toDateString();
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  let newStreak=childStats.streak||0;
+  if(childStats.last_read_date===today){}
+  else if(childStats.last_read_date===new Date(Date.now()-86400000).toDateString()) newStreak++;
+  else newStreak=1;
+  const newTotal=(childStats.total_stories||0)+1;
+
+  // Update stats in Supabase
+  await supa('PATCH','reading_stats?id=eq.'+childStats.id,{
+    streak:newStreak,
+    total_stories:newTotal,
+    last_read_date:today
+  });
+
+  // Add story to history
+  await supa('POST','stories',[{child_id:currentChild.id,idea}]);
+
+  // Update local state
+  childStats.streak=newStreak;
+  childStats.total_stories=newTotal;
+  childStats.last_read_date=today;
+  childHistory.unshift({idea,read_at:new Date().toISOString()});
+  if(childHistory.length>10)childHistory=childHistory.slice(0,10);
+
+  updateStatsUI();
+  checkNewBadge(newTotal);
+}
+
+function checkNewBadge(total){
+  const badge=BADGES.find(b=>b.count===total);
+  if(badge){setTimeout(()=>{document.getElementById('badgeModalIcon').textContent=badge.icon;document.getElementById('badgeModalTitle').textContent=badge.name;document.getElementById('badgeModalDesc').textContent=badge.desc;document.getElementById('badgeModal').classList.add('show');},2200);}
+}
+function closeBadgeModal(){document.getElementById('badgeModal').classList.remove('show');}
 
 // ============================================================
 // IDEA SCREEN
@@ -637,7 +737,7 @@ function toggleIdeaRecording(){ideaRecording?stopIdeaRecording():startIdeaRecord
 
 function startIdeaRecording(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){document.getElementById('ideaMicHint').textContent='⚠️ Please open in Google Chrome or Safari!';return;}
+  if(!SR){document.getElementById('ideaMicHint').textContent='Please open in Chrome or Safari!';return;}
   ideaRecording=true;ideaRecognition=new SR();ideaRecognition.continuous=true;ideaRecognition.interimResults=true;ideaRecognition.lang='en-US';
   const btn=document.getElementById('ideaMicBtn');btn.classList.add('recording');btn.textContent='⏹️';
   document.getElementById('ideaMicHint').textContent='🎤 Listening... tap again when done!';
@@ -648,7 +748,7 @@ function startIdeaRecording(){
     document.getElementById('ideaTyped').value=ideaText;
     document.getElementById('makeStoryBtn').disabled=ideaText.length<3;
   };
-  ideaRecognition.onerror=(e)=>{if(e.error!=='aborted')document.getElementById('ideaMicHint').textContent='⚠️ Mic error  -  try typing instead!';ideaRecording=false;btn.classList.remove('recording');btn.textContent='🎤';};
+  ideaRecognition.onerror=(e)=>{if(e.error!=='aborted'){document.getElementById('ideaMicHint').textContent='Mic error - try typing instead!';}ideaRecording=false;btn.classList.remove('recording');btn.textContent='🎤';};
   ideaRecognition.onend=()=>{if(ideaRecording){try{ideaRecognition.start();}catch(e){}}};
   ideaRecognition.start();
 }
@@ -656,7 +756,7 @@ function startIdeaRecording(){
 function stopIdeaRecording(){
   ideaRecording=false;if(ideaRecognition){try{ideaRecognition.stop();}catch(e){}ideaRecognition=null;}
   const btn=document.getElementById('ideaMicBtn');btn.classList.remove('recording');btn.textContent='🎤';
-  document.getElementById('ideaMicHint').textContent=ideaText?'Tap "Make my story!" when ready 👇':"Tap the mic to start  -  tap again when done!";
+  document.getElementById('ideaMicHint').textContent=ideaText?'Tap "Make my story!" when ready 👇':'Tap the mic to start - tap again when done!';
 }
 
 function handleTypedIdea(){
@@ -670,7 +770,7 @@ function clearIdea(){
   ideaText='';stopIdeaRecording();document.getElementById('ideaTyped').value='';
   const el=document.getElementById('ideaHeard');el.textContent='Your idea will appear here...';el.classList.add('empty');
   document.getElementById('makeStoryBtn').disabled=true;
-  document.getElementById('ideaMicHint').textContent="Tap the mic to start  -  tap again when you're done!";
+  document.getElementById('ideaMicHint').textContent='Tap the mic to start - tap again when done!';
 }
 
 function goToIdeaScreen(){if(recognition){isListening=false;try{recognition.stop();}catch(e){}}clearIdea();showScreen('screenIdea');}
@@ -678,10 +778,10 @@ function goToIdeaScreen(){if(recognition){isListening=false;try{recognition.stop
 // ============================================================
 // STORY GENERATION
 // ============================================================
-const loadingMessages=["Imagining the characters...","Building the world...","Adding some adventure...","Choosing the best words...","Almost ready...","Putting on the finishing touches..."];
+const loadingMessages=['Imagining the characters...','Building the world...','Adding some adventure...','Choosing the best words...','Almost ready...','Putting on the finishing touches...'];
 
 async function generateStory(){
-  if(!ideaText)return;
+  if(!ideaText||!currentChild)return;
   currentIdeaForHistory=ideaText;
   showScreen('screenLoading');
   document.getElementById('loadingIdea').textContent='"'+ideaText+'"';
@@ -689,29 +789,23 @@ async function generateStory(){
   const interval=setInterval(()=>{msgIdx=(msgIdx+1)%loadingMessages.length;msgEl.textContent=loadingMessages[msgIdx];},1800);
   try{
     const wordCount=getWordCount();
-    const response=await fetch("https://frosty-meadow-2088.steve-jaffe.workers.dev",{
-      method:"POST",headers:{"Content-Type":"application/json"},
+    const response=await fetch('https://frosty-meadow-2088.steve-jaffe.workers.dev',{
+      method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",max_tokens:1500,
-        system:`You are a children's story writer. Write a short story at a ${settings.readingLevel} reading level.
-Rules:
-- Exactly ${wordCount} words long
-- Fun, adventurous, with a satisfying ending
-- Vocabulary and sentence complexity appropriate for ${settings.readingLevel}
-- Do NOT include a title
-- Return ONLY the story text, nothing else`,
-        messages:[{role:"user",content:`Write a children's story based on this idea: "${ideaText}"`}]
+        model:'claude-sonnet-4-20250514',max_tokens:1500,
+        system:`You are a childrens story writer. Write a short story at a ${currentChild.reading_level} reading level. Rules: Exactly ${wordCount} words long. Fun, adventurous, with a satisfying ending. Vocabulary appropriate for ${currentChild.reading_level}. Do NOT include a title. Return ONLY the story text, nothing else.`,
+        messages:[{role:'user',content:`Write a childrens story based on this idea: "${ideaText}"`}]
       })
     });
     clearInterval(interval);
     if(!response.ok)throw new Error(response.status);
-    const text=await response.text();const data=JSON.parse(text);
+    const data=JSON.parse(await response.text());
     const storyText=data.content[0].text.trim();
     const title='The Story of '+ideaText.split(' ').slice(0,5).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
     loadStory(storyText,title);showScreen('screenReading');
   }catch(err){
     clearInterval(interval);
-    loadStory("Uh oh! The story magic had a little hiccup. Please press 'New Story Idea' below and try again.","Oops!");
+    loadStory('Uh oh! The story magic had a little hiccup. Please press New Story Idea below and try again.','Oops!');
     showScreen('screenReading');
   }
 }
@@ -720,19 +814,24 @@ Rules:
 // LOAD STORY
 // ============================================================
 function loadStory(text,title){
-  wordIndex=0;isListening=false;if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
+  wordIndex=0;isPaused=false;isListening=false;
+  if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
   document.getElementById('storyTitle').textContent=title;
-  document.getElementById('prizeText').textContent=settings.prize;
-  document.getElementById('prizeEmojiDisplay').textContent=settings.prizeEmoji;
-  document.getElementById('prizeReveal').textContent=settings.prizeEmoji+' You earned: '+settings.prize;
+  document.getElementById('prizeText').textContent=currentChild.prize||'an ice cream cone!';
+  document.getElementById('prizeEmojiDisplay').textContent='🎁';
+  document.getElementById('prizeReveal').textContent='🎁 You earned: '+(currentChild.prize||'an ice cream cone!');
   words=text.split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'').toLowerCase()).filter(w=>w.length>0);
   document.getElementById('storyDisplay').innerHTML=text.split(/\s+/).map((w,i)=>`<span class="word" id="word-${i}" onclick="hearWord(${i})">${w} </span>`).join('');
   highlightCurrent();
-  document.getElementById('startBtn').style.display='block';document.getElementById('pauseBtn').style.display='none';
+  document.getElementById('startBtn').style.display='block';
+  document.getElementById('pauseBtn').style.display='none';
+  document.getElementById('pauseBtn').textContent='⏸️ Pause Reading';
+  document.getElementById('pauseBtn').classList.remove('btn-primary');
+  document.getElementById('pauseBtn').classList.add('btn-secondary');
   document.getElementById('micDot').classList.remove('active');document.getElementById('micStatus').classList.remove('listening');
   document.getElementById('micLabel').textContent='Press the button below to start reading';
   document.getElementById('heardBox').textContent='Your words will appear here as you read...';
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){document.getElementById('startBtn').disabled=true;document.getElementById('micLabel').textContent='⚠️ Please open in Chrome (Android) or Safari (iPhone)';}
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){document.getElementById('startBtn').disabled=true;document.getElementById('micLabel').textContent='Please open in Chrome (Android) or Safari (iPhone)';}
 }
 
 // ============================================================
@@ -773,32 +872,28 @@ function startReading(){
       for(let look=1;look<=3&&(wordIndex+look)<words.length;look++){if(isMatch(s,words[wordIndex+look])){wordIndex+=look+1;skipTinyWords();highlightCurrent();consumed=full.length;if(wordIndex>=words.length){celebrate();return;}break;}}
     }
   };
-  recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micLabel').textContent='⚠️ Microphone blocked  -  please allow access!';};
+  recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micLabel').textContent='Microphone blocked - please allow access!';};
   recognition.onend=()=>{if(isListening&&!isPaused&&wordIndex<words.length)recognition.start();};
   recognition.start();
 }
 
 function togglePause(){
   if(isPaused){
-    isPaused=false;
-    isListening=true;
+    isPaused=false;isListening=true;
     document.getElementById('pauseBtn').textContent='⏸️ Pause Reading';
     document.getElementById('pauseBtn').classList.remove('btn-primary');
     document.getElementById('pauseBtn').classList.add('btn-secondary');
-    document.getElementById('micDot').classList.add('active');
-    document.getElementById('micStatus').classList.add('listening');
+    document.getElementById('micDot').classList.add('active');document.getElementById('micStatus').classList.add('listening');
     document.getElementById('micLabel').textContent='🎤 Listening... Read the highlighted word!';
     if(recognition){try{recognition.start();}catch(e){}}
-  } else {
-    isPaused=true;
-    isListening=false;
+  }else{
+    isPaused=true;isListening=false;
     if(recognition){try{recognition.stop();}catch(e){}}
     document.getElementById('pauseBtn').textContent='▶️ Resume Reading';
     document.getElementById('pauseBtn').classList.remove('btn-secondary');
     document.getElementById('pauseBtn').classList.add('btn-primary');
-    document.getElementById('micDot').classList.remove('active');
-    document.getElementById('micStatus').classList.remove('listening');
-    document.getElementById('micLabel').textContent='⏸️ Paused  -  tap Resume when ready!';
+    document.getElementById('micDot').classList.remove('active');document.getElementById('micStatus').classList.remove('listening');
+    document.getElementById('micLabel').textContent='Paused - tap Resume when ready!';
   }
 }
 
@@ -811,54 +906,125 @@ function resetReading(){
   document.getElementById('heardBox').textContent='Your words will appear here as you read...';
   document.getElementById('startBtn').style.display='block';document.getElementById('pauseBtn').style.display='none';
   document.getElementById('pauseBtn').textContent='⏸️ Pause Reading';
-  document.getElementById('pauseBtn').classList.remove('btn-primary');
-  document.getElementById('pauseBtn').classList.add('btn-secondary');
+  document.getElementById('pauseBtn').classList.remove('btn-primary');document.getElementById('pauseBtn').classList.add('btn-secondary');
 }
 
 // ============================================================
-// PARENT SETTINGS
+// PARENT SETTINGS + DASHBOARD
 // ============================================================
 function openParentGate(){pinEntry='';updatePinDots();document.getElementById('pinErrorMsg').textContent='';document.getElementById('pinModal').classList.add('show');}
 function closePinModal(){document.getElementById('pinModal').classList.remove('show');pinEntry='';updatePinDots();}
 function pinPress(digit){
   if(pinEntry.length>=4)return;pinEntry+=digit;updatePinDots();
   if(pinEntry.length===4){
-    if(pinEntry===settings.pin){closePinModal();openParentSettings();}
-    else{document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));document.getElementById('pinErrorMsg').textContent='Wrong PIN  -  try again!';setTimeout(()=>{pinEntry='';updatePinDots();document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErrorMsg').textContent='';},900);}
+    if(pinEntry===parentPin){closePinModal();openParentSettings();}
+    else{document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));document.getElementById('pinErrorMsg').textContent='Wrong PIN - try again!';setTimeout(()=>{pinEntry='';updatePinDots();document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErrorMsg').textContent='';},900);}
   }
 }
 function pinBackspace(){pinEntry=pinEntry.slice(0,-1);updatePinDots();}
 function updatePinDots(){for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('filled',i<pinEntry.length);}
-function openParentSettings(){
-  document.querySelectorAll('#levelOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(settings.readingLevel.split(' ')[0])));
-  document.querySelectorAll('#lengthOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(MINUTES[settings.storyLength]+'') ));
-  document.getElementById('prizeInput').value=settings.prize;updatePrizePreview();document.getElementById('pinInput').value='';
+
+let settingsChildId=null;
+
+async function openParentSettings(){
   showScreen('screenParent');
+  document.getElementById('pinInput').value='';
+  await loadDashboard();
+  loadSettingsChildPicker();
 }
+
+async function loadDashboard(){
+  const dash=document.getElementById('dashboardContent');
+  dash.innerHTML='<div style="text-align:center;color:#ccc;padding:16px">Loading...</div>';
+  try{
+    const children=await supa('GET','children?family_id=eq.'+familyId+'&select=*');
+    if(!children||children.length===0){dash.innerHTML='<div style="color:#ccc;text-align:center;padding:16px">No readers added yet</div>';return;}
+    const statsRows=await supa('GET','reading_stats?child_id=in.('+children.map(c=>c.id).join(',')+')'+'&select=*');
+    dash.innerHTML=children.map(child=>{
+      const st=statsRows.find(s=>s.child_id===child.id)||{streak:0,total_stories:0};
+      const badges=BADGES.map(b=>`<span class="dash-badge ${st.total_stories>=b.count?'earned':''}">${b.icon}</span>`).join('');
+      return `<div class="dash-child-row">
+        <div class="dash-avatar">${child.avatar}</div>
+        <div class="dash-info">
+          <div class="dash-name">${child.name}</div>
+          <div class="dash-stats">📚 ${st.total_stories} stories total &nbsp;•&nbsp; 🔥 ${st.streak} day streak</div>
+          <div class="dash-badges">${badges}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){dash.innerHTML='<div style="color:var(--coral);text-align:center;padding:16px">Could not load dashboard</div>';}
+}
+
+function loadSettingsChildPicker(){
+  const picker=document.getElementById('settingsChildPicker');
+  picker.innerHTML=allChildren.map(c=>`<button class="option-btn${settingsChildId===c.id?' selected':''}" onclick="selectSettingsChild('${c.id}',this)">${c.avatar} ${c.name}</button>`).join('');
+  if(currentChild){selectSettingsChildById(currentChild.id);}
+}
+
+function selectSettingsChild(id,el){
+  settingsChildId=id;
+  document.querySelectorAll('#settingsChildPicker .option-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  const child=allChildren.find(c=>c.id===id);
+  if(!child)return;
+  document.querySelectorAll('#levelOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(child.reading_level.split(' ')[0])));
+  document.querySelectorAll('#lengthOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(MINUTES[child.story_length]+'')));
+  document.getElementById('prizeInput').value=child.prize||'';
+  updatePrizePreview();
+}
+
+function selectSettingsChildById(id){
+  const el=document.querySelector(`#settingsChildPicker .option-btn`);
+  const btns=document.querySelectorAll('#settingsChildPicker .option-btn');
+  btns.forEach((btn,i)=>{if(allChildren[i]&&allChildren[i].id===id)selectSettingsChild(id,btn);});
+}
+
 function selectOption(type,value,el){
   const gid=type==='level'?'levelOptions':'lengthOptions';
   document.querySelectorAll('#'+gid+' .option-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');
-  if(type==='level')settings.readingLevel=value;else settings.storyLength=value;
 }
+
 function updatePrizePreview(){const val=document.getElementById('prizeInput').value.trim();document.getElementById('prizePreview').textContent=val?'🎁 Prize: '+val:'🎁 Prize will show here';}
-function saveSettings(){
-  const pv=document.getElementById('prizeInput').value.trim();if(pv)settings.prize=pv;
-  const pn=document.getElementById('pinInput').value.trim();
-  if(pn){if(pn.length!==4||!/^\d{4}$/.test(pn)){alert('PIN must be exactly 4 numbers!');return;}settings.pin=pn;}
-  saveSettingsToStorage();
-  const btn=document.querySelector('#screenParent .btn-purple');const orig=btn.textContent;
-  btn.textContent='✅ Saved!';setTimeout(()=>btn.textContent=orig,1500);
+
+async function saveChildSettings(){
+  if(!settingsChildId){alert('Please select a child first!');return;}
+  const levelEl=document.querySelector('#levelOptions .option-btn.selected');
+  const lengthEl=document.querySelector('#lengthOptions .option-btn.selected');
+  const prize=document.getElementById('prizeInput').value.trim();
+  if(!levelEl||!lengthEl){alert('Please select reading level and time');return;}
+  const reading_level=levelEl.textContent.trim().toLowerCase();
+  const lengthText=lengthEl.textContent.trim();
+  const story_length=lengthText.startsWith('5')?'short':lengthText.startsWith('15')?'long':'medium';
+
+  const btn=document.querySelector('#screenParent .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Saving...';btn.disabled=true;
+  try{
+    await supa('PATCH','children?id=eq.'+settingsChildId,{reading_level,story_length,prize:prize||'an ice cream cone!'});
+    // Update local allChildren
+    const idx=allChildren.findIndex(c=>c.id===settingsChildId);
+    if(idx>=0){allChildren[idx].reading_level=reading_level;allChildren[idx].story_length=story_length;allChildren[idx].prize=prize||'an ice cream cone!';}
+    // Update currentChild if same
+    if(currentChild&&currentChild.id===settingsChildId){currentChild.reading_level=reading_level;currentChild.story_length=story_length;currentChild.prize=prize||'an ice cream cone!';}
+    btn.innerHTML='✅ Saved!';setTimeout(()=>{btn.innerHTML='💾 Save Child Settings';btn.disabled=false;},1500);
+  }catch(e){
+    alert('Could not save - please try again');
+    btn.innerHTML='💾 Save Child Settings';btn.disabled=false;
+  }
 }
 
 // ============================================================
 // CELEBRATION
 // ============================================================
 function celebrate(){
-  isListening=false;if(recognition){try{recognition.stop();}catch(e){}}document.getElementById('pauseBtn').style.display='none';
+  isListening=false;if(recognition){try{recognition.stop();}catch(e){}}
+  document.getElementById('pauseBtn').style.display='none';
   document.getElementById('micLabel').textContent='🎉 You did it! Amazing reading!';
-  recordStoryFinished(currentIdeaForHistory);
-  document.getElementById('streakReveal').textContent=stats.streak>1?`🔥 ${stats.streak} day streak! Keep it up!`:'🌟 Story #'+stats.totalStories+' complete!';
-  setTimeout(()=>{document.getElementById('celebration').classList.add('show');launchConfetti();},600);
+  recordStoryFinished(currentIdeaForHistory).then(()=>{
+    const name=currentChild?currentChild.name:'';
+    document.getElementById('celebName').textContent='Amazing job'+(name?' '+name:'')+'!';
+    document.getElementById('streakReveal').textContent=(childStats&&childStats.streak>1)?'🔥 '+childStats.streak+' day streak! Keep it up!':'🌟 Story #'+(childStats?childStats.total_stories:1)+' complete!';
+    setTimeout(()=>{document.getElementById('celebration').classList.add('show');launchConfetti();},600);
+  });
 }
 
 function launchConfetti(){
@@ -870,45 +1036,30 @@ function launchConfetti(){
 function closeAndNewStory(){document.getElementById('celebration').classList.remove('show');clearIdea();showScreen('screenIdea');}
 
 // ============================================================
-// TAP TO HEAR A WORD
+// TAP TO HEAR
 // ============================================================
-// Unlock speech synthesis on first user interaction (Chrome requires this)
 let speechUnlocked=false;
-function unlockSpeech(){
-  if(speechUnlocked) return;
-  const utt=new SpeechSynthesisUtterance('');
-  window.speechSynthesis.speak(utt);
-  speechUnlocked=true;
-}
-document.addEventListener('click', unlockSpeech, {once:true});
+function unlockSpeech(){if(speechUnlocked)return;const utt=new SpeechSynthesisUtterance('');window.speechSynthesis.speak(utt);speechUnlocked=true;}
+document.addEventListener('click',unlockSpeech,{once:true});
 
 function hearWord(idx){
-  // Only speak current or upcoming words  -  not already-read ones
-  if(idx < wordIndex) return;
-  const el=document.getElementById('word-'+idx);
-  if(!el) return;
-  // Get the clean word text
-  const raw=el.textContent.trim().replace(/[^a-zA-Z',-]/g,'');
-  if(!raw) return;
-  // Cancel any current speech
+  if(idx<wordIndex)return;
+  const el=document.getElementById('word-'+idx);if(!el)return;
+  const raw=el.textContent.trim().replace(/[^a-zA-Z',-]/g,'');if(!raw)return;
   window.speechSynthesis.cancel();
-  // Animate the word
-  el.classList.add('speaking');
-  setTimeout(()=>el.classList.remove('speaking'),800);
-  // Speak it  -  slight delay lets cancel() finish first
-  setTimeout(()=>{
-    const utt=new SpeechSynthesisUtterance(raw);
-    utt.rate=0.82;
-    utt.pitch=1.1;
-    utt.volume=1;
-    window.speechSynthesis.speak(utt);
-  },50);
+  el.classList.add('speaking');setTimeout(()=>el.classList.remove('speaking'),800);
+  setTimeout(()=>{const utt=new SpeechSynthesisUtterance(raw);utt.rate=0.82;utt.pitch=1.1;utt.volume=1;window.speechSynthesis.speak(utt);},50);
 }
 
 // ============================================================
 // INIT
 // ============================================================
-loadSettings();loadStats();initStars();warmUpMic();updateStatsUI();checkLogin();
+function initStars(){const c=document.getElementById('starsContainer');for(let i=0;i<18;i++){const s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${.6+Math.random()*.7}rem`;c.appendChild(s);}}
+async function warmUpMic(){try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());}catch(e){}}
+
+initStars();
+warmUpMic();
+checkLogin();
 </script>
 </body>
 </html>
