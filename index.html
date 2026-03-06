@@ -661,9 +661,12 @@ async function saveNewChild(){
     const created=await supa('POST','children',[{family_id:familyId,name,avatar:selectedAvatar,reading_level:'3rd grade',story_length:'medium',prize:'an ice cream cone!'}]);
     closeAddChildModal();
     btn.innerHTML='Add Reader ✨';btn.disabled=false;
-    await loadChildPicker();
+    // Refresh children list and update settings picker
+    allChildren = await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
+    loadSettingsChildPicker();
   }catch(e){
-    alert('Something went wrong, please try again');
+    console.error('Add child error:', e);
+    alert('Error: ' + e.message);
     btn.innerHTML='Add Reader ✨';btn.disabled=false;
   }
 }
