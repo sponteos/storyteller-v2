@@ -7,12 +7,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="StoryReader">
-<title>StoryReader ⭐</title>
+<meta name="apple-mobile-web-app-title" content="Story Reader">
+<title>Story Reader ⭐</title>
 
 <!-- PWA Manifest (inline) -->
 <script>
-const manifestData={name:"StoryReader",short_name:"StoryReader",description:"AI-powered reading adventure for kids!",start_url:"./",display:"standalone",background_color:"#FFFBF0",theme_color:"#6EC6F5",orientation:"portrait",icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#6EC6F5"/><text y="130" x="96" font-size="110" text-anchor="middle">⭐</text></svg>'),sizes:"192x192",type:"image/svg+xml"},{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#6EC6F5"/><text y="360" x="256" font-size="300" text-anchor="middle">⭐</text></svg>'),sizes:"512x512",type:"image/svg+xml"}]};
+const manifestData={name:"Story Reader",short_name:"Story Reader",description:"AI-powered reading adventure for kids!",start_url:"./",display:"standalone",background_color:"#FFFBF0",theme_color:"#6EC6F5",orientation:"portrait",icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#6EC6F5"/><text y="130" x="96" font-size="110" text-anchor="middle">⭐</text></svg>'),sizes:"192x192",type:"image/svg+xml"},{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#6EC6F5"/><text y="360" x="256" font-size="300" text-anchor="middle">⭐</text></svg>'),sizes:"512x512",type:"image/svg+xml"}]};
 const blob=new Blob([JSON.stringify(manifestData)],{type:"application/json"});
 const manifestURL=URL.createObjectURL(blob);
 document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement("link");l.rel="manifest";l.href=manifestURL;document.head.appendChild(l);});
@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
   <div class="login-wrap">
     <div class="login-card">
       <span class="login-emoji">📚</span>
-      <h2>Welcome to StoryReader!</h2>
+      <h2>Welcome to Story Reader!</h2>
       <p>Ask a grown-up for your family code to get started</p>
       <input class="login-input" type="text" id="codeInput" placeholder="Enter your family code"
         autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
 
 <div class="container" id="mainApp" style="display:none">
   <div class="header">
-    <h1>⭐ StoryReader</h1>
+    <h1>⭐ Story Reader</h1>
     <p>Your story, your adventure!</p>
     <button class="parent-btn" onclick="openParentGate()" title="Parent Settings">⚙️</button>
   </div>
@@ -459,7 +459,7 @@ document.addEventListener("DOMContentLoaded",()=>{const l=document.createElement
     <div class="prize-reveal" id="prizeReveal">🍦 You earned: an ice cream cone!</div>
     <p style="font-size:.85rem;color:#bbb;margin-bottom:16px">Show this to a grown-up!</p>
     <button class="btn btn-purple" onclick="closeAndNewStory()">Tell a New Story 🎙️</button>
-  nt/div>
+  </div>
 </div>
 
 <script>
@@ -488,7 +488,7 @@ function submitCode(){
     document.getElementById('loginError').textContent='';
     showApp();
   } else {
-    document.getElementById('loginError').textContent='Hmm, that code doesnt match  -  try again!';
+    document.getElementById('loginError').textContent='Hmm, that code doesn't match  -  try again!';
     document.getElementById('codeInput').select();
   }
 }
