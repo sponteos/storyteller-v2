@@ -982,9 +982,9 @@ function selectSettingsChild(id,el){
   el.classList.add('selected');
   const child=allChildren.find(c=>c.id===id);
   if(!child)return;
-  // Switch the active reader
-  selectChild(child);
-  // Update name label
+  // Update current child WITHOUT navigating away from settings
+  currentChild=child;
+  document.getElementById('headerSub').textContent='Reading as '+child.name+' '+child.avatar;
   const nameEl=document.getElementById('settingsChildName');
   if(nameEl)nameEl.textContent=child.name;
   // Update settings form
