@@ -631,6 +631,16 @@ async function selectChild(child){
     const created=await supa('POST','reading_stats',[{child_id:child.id,streak:0,total_stories:0,last_read_date:null}]);
     childStats=created[0];
   }
+  // Recalculate streak on load - reset if they missed a day
+  if(childStats&&childStats.last_read_date){
+    const today=new Date().toDateString();
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    if(childStats.last_read_date!==today&&childStats.last_read_date!==yesterday){
+      // Missed at least one day - reset streak
+      childStats.streak=0;
+      await supa('PATCH','reading_stats?id=eq.'+childStats.id,{streak:0});
+    }
+  }
 
   // Load history
   const hist=await supa('GET','stories?child_id=eq.'+child.id+'&select=*&order=read_at.desc&limit=10');
