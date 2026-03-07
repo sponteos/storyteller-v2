@@ -36,7 +36,7 @@
   .header{text-align:center;padding-top:max(28px,calc(var(--safe-top) + 12px));margin-bottom:20px;position:relative}
   .header h1{font-family:'Fredoka One',cursive;font-size:2.6rem;color:white;text-shadow:2px 3px 0 rgba(0,0,0,.12);letter-spacing:1px}
   .header p{font-size:1rem;color:rgba(255,255,255,.9);font-weight:700;margin-top:4px}
-  .parent-btn{position:absolute;top:max(28px,calc(var(--safe-top) + 12px));right:0;background:rgba(255,255,255,.9);border:none;border-radius:14px;padding:9px 14px;cursor:pointer;font-size:.85rem;font-family:"Nunito",sans-serif;font-weight:800;transition:all .2s;color:var(--ink);min-width:48px;min-height:44px;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+  .parent-btn{position:absolute;top:max(28px,calc(var(--safe-top) + 12px));right:0;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.6);border-radius:50%;padding:0;cursor:pointer;font-size:1.4rem;transition:all .2s;color:white;width:46px;height:46px;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 4px rgba(0,0,0,.25)}
   .parent-btn:active{background:rgba(255,255,255,.5);transform:scale(.93)}
   .screen{display:none}.screen.active{display:block;animation:fadeUp .35s ease}
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -61,8 +61,12 @@
   .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 
   /* LOGIN */
-  .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-top:calc(var(--safe-top) + 24px);padding-bottom:calc(var(--safe-bottom) + 24px)}
-  .login-card{background:white;border-radius:28px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.12);text-align:center}
+  #loginScreen{min-height:100vh;background:linear-gradient(160deg,#B8E4FF 0%,#E8F6FF 40%,#FFFBF0 100%);position:relative;overflow:hidden}
+  #loginScreen::before{content:'☁️';position:absolute;font-size:5rem;top:5%;left:-2%;opacity:.4;animation:drift 28s linear infinite}
+  #loginScreen::after{content:'☁️';position:absolute;font-size:3.5rem;top:15%;animation:drift 35s linear infinite;animation-delay:-10s;opacity:.3}
+  .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-top:calc(var(--safe-top) + 24px);padding-bottom:calc(var(--safe-bottom) + 24px);position:relative;z-index:1}
+  .login-card{background:white;border-radius:28px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.1);text-align:center}
+  .login-sun{position:absolute;top:max(20px,calc(var(--safe-top) + 10px));right:20px;width:55px;height:55px;background:var(--sun);border-radius:50%;box-shadow:0 0 0 10px rgba(255,209,102,.25),0 0 0 20px rgba(255,209,102,.1);animation:sun-pulse 3s ease-in-out infinite}
   .login-card .login-emoji{font-size:4rem;display:block;margin-bottom:12px;animation:float 3s ease-in-out infinite}
   .login-card h2{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--ink);margin-bottom:6px}
   .login-card p{font-size:.95rem;color:#888;font-weight:600;margin-bottom:24px;line-height:1.5}
@@ -225,8 +229,7 @@
   .stars{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;overflow:hidden}
   .star{position:absolute;color:var(--sun);opacity:.12;animation:twinkle 3s ease-in-out infinite}
   @keyframes twinkle{0%,100%{opacity:.08;transform:scale(1)}50%{opacity:.25;transform:scale(1.3)}}
-  .parent-btn-label{font-size:.8rem}
-  @media(max-width:360px){.parent-btn-label{display:none}}
+
 
   .spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -244,7 +247,7 @@
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" style="display:none">
-  <div class="sky"><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="sun-icon"></div></div>
+  <div class="login-sun"></div>
   <div class="login-wrap">
     <div class="login-card">
       <span class="login-emoji">📚</span>
@@ -265,7 +268,7 @@
   <div class="header">
     <h1>Story Reader</h1>
     <p id="headerSub">Your story, your adventure!</p>
-    <button class="parent-btn" onclick="openParentGate()" title="Parent Settings">⚙️ <span class="parent-btn-label">Settings</span></button>
+    <button class="parent-btn" onclick="openParentGate()" title="Parent Settings">⚙️</button>
   </div>
 
 
@@ -544,6 +547,8 @@ async function checkLogin(){
 function showLoginScreen(){
   document.getElementById('loginScreen').style.display='block';
   document.getElementById('mainApp').style.display='none';
+  document.querySelector('.sky').style.display='none';
+  document.querySelector('.stars').style.display='none';
 }
 
 async function submitCode(){
@@ -569,6 +574,8 @@ async function loginWithCode(code, silent){
   loadPin();
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
+  document.querySelector('.sky').style.display='block';
+  document.querySelector('.stars').style.display='block';
   // Load children and auto-select first one
   allChildren = await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
   if(allChildren&&allChildren.length>0){
@@ -1087,6 +1094,9 @@ function hearWord(idx){
 function initStars(){const c=document.getElementById('starsContainer');for(let i=0;i<18;i++){const s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${.6+Math.random()*.7}rem`;c.appendChild(s);}}
 async function warmUpMic(){try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());}catch(e){}}
 
+// Hide sky until logged in
+document.querySelector('.sky').style.display='none';
+document.querySelector('.stars').style.display='none';
 initStars();
 warmUpMic();
 checkLogin();
