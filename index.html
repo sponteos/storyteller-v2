@@ -1174,7 +1174,7 @@ function selectSetupOption(type,value,el){
 
 async function saveFirstTimeSetup(){
   const name=document.getElementById('setupName').value.trim();
-  if(!name){alert('Please enter your reader's name!');return;}
+  if(!name){alert('Please enter the readers name!');return;}
   const prize=document.getElementById('setupPrize').value.trim();
   const btn=document.querySelector('#screenSetup .btn-purple');
   btn.innerHTML='<span class="spinner"></span>Setting up...';btn.disabled=true;
