@@ -881,6 +881,8 @@ async function generateStory(){
     loadStory(storyText,title);showScreen('screenReading');
   }catch(err){
     clearInterval(interval);
+    console.error('Story generation error:', err);
+    alert('Error details: ' + err.message);
     loadStory('Uh oh! The story magic had a little hiccup. Please press New Story Idea below and try again.','Oops!');
     showScreen('screenReading');
   }
