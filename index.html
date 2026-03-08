@@ -278,6 +278,46 @@
 
 
 
+  <!-- SCREEN: FIRST TIME SETUP -->
+  <div class="screen" id="screenSetup">
+    <div class="card" style="text-align:center;padding:32px 24px">
+      <div style="font-size:3.5rem;margin-bottom:12px">👋</div>
+      <div class="card-title" style="justify-content:center;margin-bottom:6px">Welcome to Story Reader!</div>
+      <p style="color:#888;font-weight:600;font-size:.95rem;margin-bottom:24px;line-height:1.6">Let's set up your first reader so the app knows what level of stories to create!</p>
+      <div class="setting-row" style="text-align:left">
+        <div class="setting-label">👤 Reader's Name</div>
+        <input class="setting-input" type="text" id="setupName" placeholder="e.g. Emma, Jack..." autocomplete="off" autocapitalize="words" />
+      </div>
+      <div class="setting-row" style="text-align:left">
+        <div class="setting-label">🎨 Pick an Avatar</div>
+        <div class="avatar-picker" id="setupAvatarPicker"></div>
+      </div>
+      <div class="setting-row" style="text-align:left">
+        <div class="setting-label">📚 Reading Level</div>
+        <div class="option-group" id="setupLevelOptions">
+          <button class="option-btn" onclick="selectSetupOption('level','1st grade',this)">1st Grade</button>
+          <button class="option-btn" onclick="selectSetupOption('level','2nd grade',this)">2nd Grade</button>
+          <button class="option-btn selected" onclick="selectSetupOption('level','3rd grade',this)">3rd Grade</button>
+          <button class="option-btn" onclick="selectSetupOption('level','4th grade',this)">4th Grade</button>
+          <button class="option-btn" onclick="selectSetupOption('level','5th grade',this)">5th Grade</button>
+        </div>
+      </div>
+      <div class="setting-row" style="text-align:left">
+        <div class="setting-label">⏱️ Reading Time</div>
+        <div class="option-group" id="setupLengthOptions">
+          <button class="option-btn" onclick="selectSetupOption('length','short',this)">5 minutes</button>
+          <button class="option-btn selected" onclick="selectSetupOption('length','medium',this)">10 minutes</button>
+          <button class="option-btn" onclick="selectSetupOption('length','long',this)">15 minutes</button>
+        </div>
+      </div>
+      <div class="setting-row" style="text-align:left">
+        <div class="setting-label">🎁 Reading Prize <span style="font-size:.78rem;color:#aaa;font-weight:600">(optional)</span></div>
+        <input class="setting-input" type="text" id="setupPrize" placeholder="e.g. 30 minutes of Minecraft..." autocomplete="off" />
+      </div>
+      <button class="btn btn-purple" onclick="saveFirstTimeSetup()" style="margin-top:8px">Let's Start Reading! 🚀</button>
+    </div>
+  </div>
+
   <!-- SCREEN: IDEA -->
   <div class="screen active" id="screenIdea">
     <div class="streak-bar">
@@ -586,9 +626,8 @@ async function loginWithCode(code, silent){
   if(allChildren&&allChildren.length>0){
     await selectChild(allChildren[0]);
   } else {
-    // No children yet - show idea screen with no child selected
-    showScreen('screenIdea');
-    document.getElementById('headerSub').textContent='Add a reader in ⚙️ Settings!';
+    // No children yet - show first time setup
+    showFirstTimeSetup();
   }
 }
 
@@ -1101,6 +1140,61 @@ function hearWord(idx){
   window.speechSynthesis.cancel();
   el.classList.add('speaking');setTimeout(()=>el.classList.remove('speaking'),800);
   setTimeout(()=>{const utt=new SpeechSynthesisUtterance(raw);utt.rate=0.82;utt.pitch=1.1;utt.volume=1;window.speechSynthesis.speak(utt);},50);
+}
+
+// ============================================================
+// FIRST TIME SETUP
+// ============================================================
+let setupLevel='3rd grade';
+let setupLength='medium';
+let setupAvatar=AVATARS[0];
+
+function showFirstTimeSetup(){
+  showScreen('screenSetup');
+  setupLevel='3rd grade';setupLength='medium';setupAvatar=AVATARS[0];
+  document.getElementById('setupName').value='';
+  document.getElementById('setupPrize').value='';
+  // Render avatar picker
+  const picker=document.getElementById('setupAvatarPicker');
+  picker.innerHTML=AVATARS.map((a,i)=>`<button class="avatar-opt${i===0?' selected':''}" onclick="pickSetupAvatar('${a}',this)">${a}</button>`).join('');
+}
+
+function pickSetupAvatar(a,el){
+  setupAvatar=a;
+  document.querySelectorAll('#setupAvatarPicker .avatar-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectSetupOption(type,value,el){
+  const gid=type==='level'?'setupLevelOptions':'setupLengthOptions';
+  document.querySelectorAll('#'+gid+' .option-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  if(type==='level')setupLevel=value;else setupLength=value;
+}
+
+async function saveFirstTimeSetup(){
+  const name=document.getElementById('setupName').value.trim();
+  if(!name){alert('Please enter your reader's name!');return;}
+  const prize=document.getElementById('setupPrize').value.trim();
+  const btn=document.querySelector('#screenSetup .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Setting up...';btn.disabled=true;
+  try{
+    const created=await supa('POST','children',[{
+      family_id:familyId,
+      name,
+      avatar:setupAvatar,
+      reading_level:setupLevel,
+      story_length:setupLength,
+      prize:prize||'an ice cream cone!'
+    }]);
+    allChildren=await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
+    await selectChild(allChildren[0]);
+    btn.innerHTML='Lets Start Reading! 🚀';btn.disabled=false;
+  }catch(e){
+    console.error(e);
+    alert('Something went wrong, please try again');
+    btn.innerHTML='Lets Start Reading! 🚀';btn.disabled=false;
+  }
 }
 
 // ============================================================
