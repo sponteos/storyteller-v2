@@ -472,6 +472,17 @@
   </div>
 </div>
 
+<!-- EDIT CHILD MODAL -->
+<div class="modal" id="editChildModal">
+  <div class="add-child-modal-card">
+    <h3>✏️ Edit Reader</h3>
+    <div class="avatar-picker" id="editAvatarPicker"></div>
+    <input class="setting-input" type="text" id="editChildName" placeholder="Child's name" autocomplete="off" autocapitalize="words" style="margin-bottom:14px" />
+    <button class="btn btn-purple" onclick="saveEditChild()">Save Changes ✅</button>
+    <button class="btn btn-ghost" onclick="closeEditChildModal()" style="font-size:1rem;padding:14px">Cancel</button>
+  </div>
+</div>
+
 <!-- BADGE MODAL -->
 <div class="modal" id="badgeModal">
   <div class="badge-modal-card">
@@ -531,6 +542,7 @@ let childHistory = [];
 let allChildren = [];
 
 let words=[],wordIndex=0,recognition=null,isListening=false,isPaused=false;
+let assistedWord=-1,assistedAttempts=0,wordAttempts={};
 let ideaText='',ideaRecognition=null,ideaRecording=false;
 let pinEntry='',currentIdeaForHistory='';
 let parentPin='1234';
@@ -892,7 +904,7 @@ async function generateStory(){
 // LOAD STORY
 // ============================================================
 function loadStory(text,title){
-  wordIndex=0;isPaused=false;isListening=false;
+  wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};
   if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
   document.getElementById('storyTitle').textContent=title;
   document.getElementById('prizeText').textContent=currentChild.prize||'an ice cream cone!';
@@ -946,8 +958,42 @@ function startReading(){
     const spoken=full.slice(consumed).trim().toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
     for(const s of spoken){
       if(wordIndex>=words.length)break;
-      if(isMatch(s,words[wordIndex])){wordIndex++;skipTinyWords();highlightCurrent();consumed=full.length;if(wordIndex>=words.length){celebrate();return;}continue;}
-      for(let look=1;look<=3&&(wordIndex+look)<words.length;look++){if(isMatch(s,words[wordIndex+look])){wordIndex+=look+1;skipTinyWords();highlightCurrent();consumed=full.length;if(wordIndex>=words.length){celebrate();return;}break;}}
+      // ASSISTED MODE: any speech counts, advance after 2 attempts
+      if(assistedWord===wordIndex&&s.length>0){
+        assistedAttempts++;
+        consumed=full.length;
+        if(assistedAttempts>=2){
+          assistedWord=-1;assistedAttempts=0;
+          wordAttempts[wordIndex]=0;
+          wordIndex++;skipTinyWords();highlightCurrent();
+          document.getElementById('heardBox').textContent='🎧 Hearing: "'+full.trim().slice(-60)+'"';
+          if(wordIndex>=words.length){celebrate();return;}
+        } else {
+          document.getElementById('heardBox').textContent='👆 One more time - say anything to continue!';
+        }
+        continue;
+      }
+      // NORMAL MODE: match the word
+      if(isMatch(s,words[wordIndex])){
+        wordIndex++;skipTinyWords();highlightCurrent();consumed=full.length;
+        wordAttempts[wordIndex]=0;
+        if(wordIndex>=words.length){celebrate();return;}
+        continue;
+      }
+      // Track failed attempts for auto-advance (Option 2)
+      if(s.length>0){
+        wordAttempts[wordIndex]=(wordAttempts[wordIndex]||0)+1;
+        if(wordAttempts[wordIndex]>=5){
+          // Auto-advance after 5 failed attempts
+          wordAttempts[wordIndex]=0;
+          assistedWord=-1;assistedAttempts=0;
+          wordIndex++;skipTinyWords();highlightCurrent();consumed=full.length;
+          document.getElementById('heardBox').textContent='🎧 Hearing: "'+full.trim().slice(-60)+'"';
+          if(wordIndex>=words.length){celebrate();return;}
+          continue;
+        }
+      }
+      for(let look=1;look<=3&&(wordIndex+look)<words.length;look++){if(isMatch(s,words[wordIndex+look])){wordIndex+=look+1;skipTinyWords();highlightCurrent();consumed=full.length;wordAttempts[wordIndex]=0;if(wordIndex>=words.length){celebrate();return;}break;}}
     }
   };
   recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micLabel').textContent='Microphone blocked - please allow access!';};
@@ -1039,7 +1085,11 @@ function loadSettingsChildPicker(){
     picker.innerHTML='<p style="color:#ccc;font-size:.9rem;font-weight:600">No readers yet - add one above!</p>';
     return;
   }
-  picker.innerHTML=allChildren.map(c=>`<button class="option-btn${currentChild&&currentChild.id===c.id?' selected':''}" onclick="selectSettingsChild('${c.id}',this)">${c.avatar} ${c.name}</button>`).join('');
+  picker.innerHTML=allChildren.map(c=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;width:100%">
+      <button class="option-btn${currentChild&&currentChild.id===c.id?' selected':''}" style="flex:1" onclick="selectSettingsChild('${c.id}',this)">${c.avatar} ${c.name}</button>
+      <button class="btn btn-ghost btn-sm" style="margin:0;flex-shrink:0" onclick="openEditChildModal('${c.id}')">✏️ Edit</button>
+    </div>`).join('');
   if(currentChild){
     settingsChildId=currentChild.id;
     const nameEl=document.getElementById('settingsChildName');
@@ -1142,6 +1192,60 @@ function hearWord(idx){
   window.speechSynthesis.cancel();
   el.classList.add('speaking');setTimeout(()=>el.classList.remove('speaking'),800);
   setTimeout(()=>{const utt=new SpeechSynthesisUtterance(raw);utt.rate=0.82;utt.pitch=1.1;utt.volume=1;window.speechSynthesis.speak(utt);},50);
+  // Enable assisted mode for this word
+  if(idx===wordIndex){
+    assistedWord=idx;
+    assistedAttempts=0;
+    document.getElementById('heardBox').textContent='👆 Assisted mode - say anything twice to continue!';
+  }
+}
+
+// ============================================================
+// EDIT CHILD
+// ============================================================
+let editChildId=null;
+let editAvatar=AVATARS[0];
+
+function openEditChildModal(id){
+  editChildId=id;
+  const child=allChildren.find(c=>c.id===id);
+  if(!child)return;
+  editAvatar=child.avatar;
+  document.getElementById('editChildName').value=child.name;
+  const picker=document.getElementById('editAvatarPicker');
+  picker.innerHTML=AVATARS.map(a=>`<button class="avatar-opt${a===child.avatar?' selected':''}" onclick="pickEditAvatar('${a}',this)">${a}</button>`).join('');
+  document.getElementById('editChildModal').classList.add('show');
+}
+
+function pickEditAvatar(a,el){
+  editAvatar=a;
+  document.querySelectorAll('#editAvatarPicker .avatar-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function closeEditChildModal(){document.getElementById('editChildModal').classList.remove('show');}
+
+async function saveEditChild(){
+  const name=document.getElementById('editChildName').value.trim();
+  if(!name){alert('Please enter a name!');return;}
+  const btn=document.querySelector('#editChildModal .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Saving...';btn.disabled=true;
+  try{
+    await supa('PATCH','children?id=eq.'+editChildId,{name,avatar:editAvatar});
+    // Update local state
+    const idx=allChildren.findIndex(c=>c.id===editChildId);
+    if(idx>=0){allChildren[idx].name=name;allChildren[idx].avatar=editAvatar;}
+    if(currentChild&&currentChild.id===editChildId){
+      currentChild.name=name;currentChild.avatar=editAvatar;
+      document.getElementById('headerSub').textContent='Reading as '+name+' '+editAvatar;
+    }
+    closeEditChildModal();
+    loadSettingsChildPicker();
+    btn.innerHTML='Save Changes ✅';btn.disabled=false;
+  }catch(e){
+    alert('Something went wrong, please try again');
+    btn.innerHTML='Save Changes ✅';btn.disabled=false;
+  }
 }
 
 // ============================================================
