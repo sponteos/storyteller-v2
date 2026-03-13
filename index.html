@@ -76,6 +76,15 @@
   .login-input:focus{border-color:var(--purple)}
   .login-input::placeholder{letter-spacing:0;text-transform:none;font-weight:600;color:#ccc}
   .login-error{color:var(--coral);font-weight:800;font-size:.9rem;min-height:22px;margin:10px 0 4px}
+  .auth-tabs{display:flex;gap:4px;background:#F5F5F5;border-radius:14px;padding:4px;margin-bottom:20px}
+  .auth-tab{flex:1;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;border:none;border-radius:10px;padding:10px 6px;cursor:pointer;background:transparent;color:#aaa;transition:all .2s;touch-action:manipulation}
+  .auth-tab.active{background:white;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .auth-panel{animation:fadeUp .25s ease}
+  .google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border:2px solid #e0e0e0;border-radius:14px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:var(--ink);transition:all .15s;margin-bottom:4px;touch-action:manipulation}
+  .google-btn:active{background:#f5f5f5;transform:scale(.98)}
+  .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:#ccc;font-size:.82rem;font-weight:700}
+  .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:#eee}
+  .link-btn{background:none;border:none;color:var(--purple);font-weight:800;font-size:inherit;cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:underline;padding:0}
 
   /* CHILD PICKER */
   .child-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:8px}
@@ -254,14 +263,55 @@
   <div class="login-wrap">
     <div class="login-card">
       <span class="login-emoji">📚</span>
-      <h2>Welcome to Story Reader!</h2>
-      <p>Ask a grown-up for your family code to get started</p>
-      <input class="login-input" type="text" id="codeInput" placeholder="Enter your family code"
-        autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-        oninput="this.value=this.value.toUpperCase()"
-        onkeydown="if(event.key==='Enter')submitCode()" />
-      <div class="login-error" id="loginError"></div>
-      <button class="btn btn-purple" onclick="submitCode()" style="width:100%;margin-top:4px">Lets Read! ✨</button>
+      <h2>Story Reader</h2>
+      <p>The reading adventure starts here!</p>
+
+      <!-- AUTH TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login',this)">Log In</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup',this)">Sign Up</button>
+        <button class="auth-tab" onclick="switchAuthTab('code',this)">Family Code</button>
+      </div>
+
+      <!-- LOG IN TAB -->
+      <div class="auth-panel" id="panelLogin">
+        <button class="google-btn" onclick="loginWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+          Continue with Google
+        </button>
+        <div class="auth-divider"><span>or</span></div>
+        <input class="setting-input" type="email" id="loginEmail" placeholder="Email address" autocomplete="email" style="margin-bottom:10px" />
+        <input class="setting-input" type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" style="margin-bottom:6px" onkeydown="if(event.key==='Enter')submitEmailLogin()" />
+        <div style="text-align:right;margin-bottom:14px"><button class="link-btn" onclick="showForgotPassword()">Forgot password?</button></div>
+        <div class="login-error" id="loginError"></div>
+        <button class="btn btn-purple" onclick="submitEmailLogin()" style="width:100%">Log In</button>
+        <p style="font-size:.8rem;color:#bbb;margin-top:12px;font-weight:600">No account? <button class="link-btn" onclick="switchAuthTab('signup',document.querySelectorAll('.auth-tab')[1])">Sign up free</button></p>
+      </div>
+
+      <!-- SIGN UP TAB -->
+      <div class="auth-panel" id="panelSignup" style="display:none">
+        <button class="google-btn" onclick="loginWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+          Sign Up with Google
+        </button>
+        <div class="auth-divider"><span>or</span></div>
+        <input class="setting-input" type="email" id="signupEmail" placeholder="Email address" autocomplete="email" style="margin-bottom:10px" />
+        <input class="setting-input" type="password" id="signupPassword" placeholder="Password (min 6 characters)" autocomplete="new-password" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')submitEmailSignup()" />
+        <div class="login-error" id="signupError"></div>
+        <button class="btn btn-purple" onclick="submitEmailSignup()" style="width:100%">Create Account</button>
+      </div>
+
+      <!-- FAMILY CODE TAB -->
+      <div class="auth-panel" id="panelCode" style="display:none">
+        <p style="color:#888;font-weight:600;font-size:.9rem;margin-bottom:16px">Ask a grown-up for your family code to get started</p>
+        <input class="login-input" type="text" id="codeInput" placeholder="Enter your family code"
+          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+          oninput="this.value=this.value.toUpperCase()"
+          onkeydown="if(event.key==='Enter')submitCode()" />
+        <div class="login-error" id="codeError"></div>
+        <button class="btn btn-purple" onclick="submitCode()" style="width:100%;margin-top:12px">Lets Read! ✨</button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -593,12 +643,82 @@ function showScreen(id){
 // ============================================================
 // LOGIN
 // ============================================================
-async function checkLogin(){
+
+let supaAuth=null;
+
+async function loadSupabaseClient(){
+  return new Promise((resolve)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.onload=()=>{supaAuth=window.supabase.createClient(SUPA_URL,SUPA_KEY);resolve();};
+    document.head.appendChild(s);
+  });
+}
+
+function switchAuthTab(tab,el){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.auth-panel').forEach(p=>p.style.display='none');
+  document.getElementById('panel'+tab.charAt(0).toUpperCase()+tab.slice(1)).style.display='block';
+}
+
+function showForgotPassword(){
+  const email=document.getElementById('loginEmail').value.trim();
+  if(!email){alert('Please enter your email address first');return;}
+  supaAuth.auth.resetPasswordForEmail(email,{redirectTo:'https://storyreader.app'})
+    .then(()=>alert('Password reset email sent! Check your inbox.'))
+    .catch(e=>alert('Error: '+e.message));
+}
+
+async function loginWithGoogle(){
   try{
-    const saved=localStorage.getItem('sr_family_code');
-    if(saved) await loginWithCode(saved,true);
-    else showLoginScreen();
-  }catch(e){showLoginScreen();}
+    await supaAuth.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://storyreader.app'}});
+  }catch(e){alert('Google login error: '+e.message);}
+}
+
+async function submitEmailLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  if(!email||!password){document.getElementById('loginError').textContent='Please enter email and password';return;}
+  const btn=document.querySelector('#panelLogin .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Logging in...';btn.disabled=true;
+  try{
+    const {data,error}=await supaAuth.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    await handleAuthUser(data.user);
+  }catch(e){
+    document.getElementById('loginError').textContent=e.message||'Login failed - please try again';
+    btn.innerHTML='Log In';btn.disabled=false;
+  }
+}
+
+async function submitEmailSignup(){
+  const email=document.getElementById('signupEmail').value.trim();
+  const password=document.getElementById('signupPassword').value;
+  if(!email||!password){document.getElementById('signupError').textContent='Please enter email and password';return;}
+  if(password.length<6){document.getElementById('signupError').textContent='Password must be at least 6 characters';return;}
+  const btn=document.querySelector('#panelSignup .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Creating account...';btn.disabled=true;
+  try{
+    const {data,error}=await supaAuth.auth.signUp({email,password});
+    if(error)throw error;
+    await handleAuthUser(data.user);
+  }catch(e){
+    document.getElementById('signupError').textContent=e.message||'Signup failed - please try again';
+    btn.innerHTML='Create Account';btn.disabled=false;
+  }
+}
+
+async function handleAuthUser(user){
+  if(!user)return;
+  let rows=await supa('GET','families?user_id=eq.'+user.id+'&select=id');
+  if(!rows||rows.length===0){
+    const created=await supa('POST','families',[{user_id:user.id,code:null}]);
+    rows=created;
+  }
+  familyId=rows[0].id;
+  loadPin();
+  await enterApp();
 }
 
 function showLoginScreen(){
@@ -610,37 +730,48 @@ function showLoginScreen(){
 
 async function submitCode(){
   const val=document.getElementById('codeInput').value.trim().toUpperCase();
-  if(!val){document.getElementById('loginError').textContent='Please enter your family code!';return;}
-  const btn=document.querySelector('#loginScreen .btn-purple');
-  btn.innerHTML='<span class="spinner"></span>Checking...';
-  btn.disabled=true;
+  if(!val){document.getElementById('codeError').textContent='Please enter your family code!';return;}
+  const btn=document.querySelector('#panelCode .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Checking...';btn.disabled=true;
   try{
-    await loginWithCode(val,false);
+    await loginWithCode(val);
   }catch(e){
-    document.getElementById('loginError').textContent='Hmm, that code doesnt match - try again!';
-    btn.innerHTML='Lets Read! ✨';
-    btn.disabled=false;
+    document.getElementById('codeError').textContent='Hmm, that code doesnt match - try again!';
+    btn.innerHTML='Lets Read! ✨';btn.disabled=false;
   }
 }
 
-async function loginWithCode(code, silent){
-  const rows = await supa('GET','families?code=eq.'+code+'&select=id');
-  if(!rows||rows.length===0) throw new Error('Invalid code');
-  familyId = rows[0].id;
+async function loginWithCode(code){
+  const rows=await supa('GET','families?code=eq.'+code+'&select=id');
+  if(!rows||rows.length===0)throw new Error('Invalid code');
+  familyId=rows[0].id;
   try{localStorage.setItem('sr_family_code',code);}catch(e){}
   loadPin();
+  await enterApp();
+}
+
+async function enterApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
   document.querySelector('.sky').style.display='block';
   document.querySelector('.stars').style.display='block';
-  // Load children and auto-select first one
-  allChildren = await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
-  if(allChildren&&allChildren.length>0){
-    await selectChild(allChildren[0]);
-  } else {
-    // No children yet - show first time setup
-    showFirstTimeSetup();
-  }
+  allChildren=await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
+  if(allChildren&&allChildren.length>0){await selectChild(allChildren[0]);}
+  else{showFirstTimeSetup();}
+}
+
+async function checkLogin(){
+  await loadSupabaseClient();
+  const {data:{session}}=await supaAuth.auth.getSession();
+  if(session){await handleAuthUser(session.user);return;}
+  try{
+    const saved=localStorage.getItem('sr_family_code');
+    if(saved){await loginWithCode(saved);return;}
+  }catch(e){}
+  showLoginScreen();
+  supaAuth.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_IN'&&session){await handleAuthUser(session.user);}
+  });
 }
 
 // ============================================================
@@ -894,7 +1025,6 @@ async function generateStory(){
   }catch(err){
     clearInterval(interval);
     console.error('Story generation error:', err);
-    alert('Error details: ' + err.message);
     loadStory('Uh oh! The story magic had a little hiccup. Please press New Story Idea below and try again.','Oops!');
     showScreen('screenReading');
   }
