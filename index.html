@@ -762,16 +762,21 @@ async function enterApp(){
 
 async function checkLogin(){
   await loadSupabaseClient();
+  // Handle OAuth redirect - tokens come back in URL hash
+  supaAuth.auth.onAuthStateChange(async(event,session)=>{
+    if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&session){
+      await handleAuthUser(session.user);
+    }
+  });
+  // Check for existing session
   const {data:{session}}=await supaAuth.auth.getSession();
   if(session){await handleAuthUser(session.user);return;}
+  // Check for saved family code
   try{
     const saved=localStorage.getItem('sr_family_code');
     if(saved){await loginWithCode(saved);return;}
   }catch(e){}
   showLoginScreen();
-  supaAuth.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session){await handleAuthUser(session.user);}
-  });
 }
 
 // ============================================================
