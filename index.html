@@ -1468,12 +1468,11 @@ async function saveFirstTimeSetup(){
 // INIT
 // ============================================================
 function initStars(){const c=document.getElementById('starsContainer');for(let i=0;i<18;i++){const s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${.6+Math.random()*.7}rem`;c.appendChild(s);}}
-let micStream=null;
 async function warmUpMic(){
   try{
-    // Request mic permission once and keep stream alive to prevent repeated prompts
-    micStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    // Don't stop the tracks - keeping stream alive prevents Chrome from re-asking
+    // Request permission upfront then release - Chrome remembers the grant
+    const s=await navigator.mediaDevices.getUserMedia({audio:true});
+    s.getTracks().forEach(t=>t.stop());
   }catch(e){
     console.log('Mic permission denied or unavailable');
   }
