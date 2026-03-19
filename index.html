@@ -1071,7 +1071,7 @@ function loadStory(text,title){
   document.getElementById('micDot').classList.remove('active');document.getElementById('micStatus').classList.remove('listening');
   document.getElementById('micLabel').textContent='Press the button below to start reading';
   document.getElementById('heardBox').textContent='Your words will appear here as you read...';
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){document.getElementById('startBtn').disabled=true;document.getElementById('micLabel').textContent='Please open in Chrome (Android) or Safari (iPhone)';}
+  const SR2=window.SpeechRecognition||window.webkitSpeechRecognition;document.getElementById('startBtn').disabled=!SR2;if(!SR2)document.getElementById('micLabel').textContent='Please open in Chrome (Android) or Safari (iPhone)';
 }
 
 // ============================================================
@@ -1098,8 +1098,8 @@ function skipTinyWords(){while(wordIndex<words.length&&SKIP_WORDS.has(words[word
 // READING
 // ============================================================
 function startReading(){
-  if(isListening)return; // prevent double-trigger
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('micLabel').textContent='Speech recognition not supported - try Chrome or Safari';return;}
   recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
   let consumed=0;
   recognition.onstart=()=>{isListening=true;consumed=0;document.getElementById('micDot').classList.add('active');document.getElementById('micStatus').classList.add('listening');document.getElementById('micLabel').textContent='🎤 Listening... Read the highlighted word!';document.getElementById('startBtn').style.display='none';document.getElementById('pauseBtn').style.display='block';skipTinyWords();highlightCurrent();};
@@ -1149,14 +1149,13 @@ function startReading(){
   };
   recognition.onerror=(e)=>{
     console.log('Speech error:', e.error);
-    document.getElementById('micLabel').textContent='Error: '+e.error;
     if(e.error==='not-allowed')document.getElementById('micLabel').textContent='Microphone blocked - please allow access!';
-    if(e.error==='aborted'||e.error==='network'){isListening=false;}
+    if(e.error==='aborted'||e.error==='network')isListening=false;
   };
   recognition.onend=()=>{
     console.log('Speech ended, isListening:',isListening,'isPaused:',isPaused);
     if(isListening&&!isPaused&&wordIndex<words.length){
-      try{recognition.start();}catch(e){console.log('Restart error:',e);}
+      try{recognition.start();}catch(e){console.log('Restart failed:',e.message);}
     }
   };
   recognition.start();
