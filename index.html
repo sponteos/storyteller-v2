@@ -758,6 +758,7 @@ async function enterApp(){
   document.getElementById('mainApp').style.display='block';
   document.querySelector('.sky').style.display='block';
   document.querySelector('.stars').style.display='block';
+  warmUpMic(); // request mic permission after user interaction
   allChildren=await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
   if(allChildren&&allChildren.length>0){await selectChild(allChildren[0]);}
   else{showFirstTimeSetup();}
@@ -1145,8 +1146,18 @@ function startReading(){
       for(let look=1;look<=1&&(wordIndex+look)<words.length;look++){if(isMatch(s,words[wordIndex+look])){wordIndex+=look+1;skipTinyWords();highlightCurrent();consumed=full.length;wordAttempts[wordIndex]=0;if(wordIndex>=words.length){celebrate();return;}break;}}
     }
   };
-  recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micLabel').textContent='Microphone blocked - please allow access!';};
-  recognition.onend=()=>{if(isListening&&!isPaused&&wordIndex<words.length)recognition.start();};
+  recognition.onerror=(e)=>{
+    console.log('Speech error:', e.error);
+    document.getElementById('micLabel').textContent='Error: '+e.error;
+    if(e.error==='not-allowed')document.getElementById('micLabel').textContent='Microphone blocked - please allow access!';
+    if(e.error==='aborted'||e.error==='network'){isListening=false;}
+  };
+  recognition.onend=()=>{
+    console.log('Speech ended, isListening:',isListening,'isPaused:',isPaused);
+    if(isListening&&!isPaused&&wordIndex<words.length){
+      try{recognition.start();}catch(e){console.log('Restart error:',e);}
+    }
+  };
   recognition.start();
 }
 
@@ -1483,7 +1494,6 @@ async function warmUpMic(){
 document.querySelector('.sky').style.display='none';
 document.querySelector('.stars').style.display='none';
 initStars();
-warmUpMic();
 checkLogin();
 </script>
 </body>
