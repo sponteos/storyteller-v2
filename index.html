@@ -1096,6 +1096,7 @@ function skipTinyWords(){while(wordIndex<words.length&&SKIP_WORDS.has(words[word
 // READING
 // ============================================================
 function startReading(){
+  if(isListening)return; // prevent double-trigger
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
   recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
   let consumed=0;
