@@ -1020,6 +1020,7 @@ const loadingMessages=['Imagining the characters...','Building the world...','Ad
 
 async function generateStory(){
   if(!ideaText||!currentChild)return;
+  stopIdeaRecording(); // make sure idea mic is off before generating
   currentIdeaForHistory=ideaText;
   showScreen('screenLoading');
   document.getElementById('loadingIdea').textContent='"'+ideaText+'"';
