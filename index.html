@@ -1098,6 +1098,7 @@ function skipTinyWords(){while(wordIndex<words.length&&SKIP_WORDS.has(words[word
 // READING
 // ============================================================
 function startReading(){
+  alert('startReading called! SR available: '+(!!window.SpeechRecognition||!!window.webkitSpeechRecognition));
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){document.getElementById('micLabel').textContent='Speech recognition not supported - try Chrome or Safari';return;}
   recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
