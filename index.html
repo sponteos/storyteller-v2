@@ -567,11 +567,20 @@ const SUPA_URL='https://scsgvyhqvbjdbyqgdaqj.supabase.co';
 const SUPA_KEY='sb_publishable_IZa375ss-5YzVikrGKmZbA_-Fyue7Gl';
 
 async function supa(method, path, body){
+  // Use the user's session token if available, fall back to anon key
+  let token = SUPA_KEY;
+  try{
+    if(supaAuth){
+      const {data:{session}} = await supaAuth.auth.getSession();
+      if(session?.access_token) token = session.access_token;
+    }
+  }catch(e){}
+
   const res = await fetch(SUPA_URL+'/rest/v1/'+path, {
     method,
     headers:{
       'apikey': SUPA_KEY,
-      'Authorization': 'Bearer '+SUPA_KEY,
+      'Authorization': 'Bearer '+token,
       'Content-Type': 'application/json',
       'Prefer': method==='POST' ? 'return=representation' : ''
     },
