@@ -48,7 +48,7 @@
   .card.active-card{border-color:var(--sky)}
   .card-title{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:10px}
   .card-title .icon{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-  .icon-blue{background:#EFF8FF}.icon-yellow{background:#FFFBEF}.icon-purple{background:#F5F0FF}.icon-green{background:#EFFFF9}.icon-orange{background:#FFF7EF}.icon-coral{background:#FFF0F0}
+  .icon-blue{background:#EFF8FF}.icon-yellow{background:#FFFBEF}.icon-purple{background:#F5F0FF}.icon-green{background:#EFFFF9}.icon-orange{background:#FFF7EF}.icon-coral{background:#FFF0F0}.icon-sky{background:#EFF8FF}
 
   /* BUTTONS */
   .btn{font-family:'Fredoka One',cursive;font-size:1.15rem;border:none;border-radius:18px;padding:16px 28px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;letter-spacing:.4px;min-height:54px;touch-action:manipulation}
@@ -247,6 +247,45 @@
 
   @media(min-width:480px){.container{padding:24px 24px 100px}.story-box{font-size:1.2rem}.card{padding:28px}}
   @media(max-width:479px){.sky .sun-icon{display:none}}
+
+  /* BOTTOM NAV */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #eee;display:flex;z-index:50;padding-bottom:var(--safe-bottom);box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+  .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;border:none;background:none;color:#bbb;font-family:'Nunito',sans-serif;font-weight:800;font-size:.68rem;gap:3px;transition:all .2s;touch-action:manipulation}
+  .nav-btn .nav-icon{font-size:1.5rem;transition:transform .2s}
+  .nav-btn.active{color:var(--purple)}
+  .nav-btn.active .nav-icon{transform:scale(1.15)}
+  .nav-badge{background:var(--coral);color:white;border-radius:10px;padding:1px 6px;font-size:.65rem;font-weight:800;position:absolute;top:6px;right:calc(50% - 22px)}
+
+  /* FEED */
+  .feed-item{background:white;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+  .feed-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .feed-avatar{font-size:2rem;flex-shrink:0}
+  .feed-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--ink)}
+  .feed-time{font-size:.75rem;color:#bbb;font-weight:600}
+  .feed-idea{background:linear-gradient(135deg,#FFFBF0,#FFF8E8);border:1.5px dashed #FFD166;border-radius:12px;padding:12px 14px;font-size:.92rem;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5}
+  .feed-reactions{display:flex;gap:8px;align-items:center}
+  .reaction-btn{background:#F5F5F5;border:2px solid transparent;border-radius:12px;padding:7px 12px;font-size:1.1rem;cursor:pointer;transition:all .15s;touch-action:manipulation;display:flex;align-items:center;gap:5px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:#888}
+  .reaction-btn.reacted{border-color:var(--sun);background:linear-gradient(135deg,#FFFDF0,#FFF8E0);color:#D4900A}
+  .reaction-btn:active{transform:scale(.92)}
+  .feed-empty{text-align:center;padding:40px 20px;color:#ccc;font-weight:600}
+  .feed-empty .feed-empty-icon{font-size:3rem;display:block;margin-bottom:10px}
+
+  /* FRIENDS */
+  .friend-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #f5f5f5}
+  .friend-item:last-child{border-bottom:none}
+  .friend-avatar{font-size:2rem;flex-shrink:0}
+  .friend-info{flex:1}
+  .friend-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--ink)}
+  .friend-username{font-size:.78rem;color:#bbb;font-weight:600}
+  .friend-action{flex-shrink:0}
+  .pill-btn{font-family:'Fredoka One',cursive;font-size:.85rem;border:none;border-radius:12px;padding:8px 14px;cursor:pointer;transition:all .15s;touch-action:manipulation;min-height:36px}
+  .pill-btn:active{transform:scale(.93)}
+  .pill-accept{background:linear-gradient(135deg,var(--grass),#00B896);color:white}
+  .pill-decline{background:#F0F0F0;color:#aaa;margin-left:6px}
+  .pill-remove{background:#FFF0F0;color:var(--coral)}
+  .search-box{width:100%;padding:13px 16px;border-radius:14px;border:2px solid #e0e0e0;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:var(--ink);outline:none;transition:border-color .2s;background:white;-webkit-appearance:none;margin-bottom:12px}
+  .search-box:focus{border-color:var(--sky)}
+  .username-display{background:linear-gradient(135deg,#F5F0FF,#EDE8FF);border-radius:14px;padding:12px 16px;font-weight:800;color:#5B21B6;font-size:.95rem;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
 </style>
 </head>
 <body>
@@ -337,6 +376,10 @@
       <div class="setting-row" style="text-align:left">
         <div class="setting-label">👤 Reader's Name</div>
         <input class="setting-input" type="text" id="setupName" placeholder="e.g. Emma, Jack..." autocomplete="off" autocapitalize="words" />
+      </div>
+      <div class="setting-row" style="text-align:left">
+        <div class="setting-label">🔤 Username <span style="font-size:.78rem;color:#aaa;font-weight:600">(friends use this to find you)</span></div>
+        <input class="setting-input" type="text" id="setupUsername" placeholder="e.g. emma_reads, jack123" autocomplete="off" autocapitalize="none" autocorrect="off" style="text-transform:lowercase" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')" />
       </div>
       <div class="setting-row" style="text-align:left">
         <div class="setting-label">🎨 Pick an Avatar</div>
@@ -492,6 +535,56 @@
   </div>
 
 </div><!-- end container -->
+  <!-- SCREEN: FEED -->
+  <div class="screen" id="screenFeed">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-coral">📖</div>Friends Feed</div>
+      <div id="feedContent"><div style="text-align:center;color:#ccc;padding:20px">Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- SCREEN: FRIENDS -->
+  <div class="screen" id="screenFriends">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-purple">👤</div>Your Username</div>
+      <div class="username-display">
+        <span>@<span id="myUsername">...</span></span>
+        <button class="pill-btn pill-accept" onclick="copyUsername()" style="font-size:.8rem;padding:6px 12px">Copy 📋</button>
+      </div>
+      <p style="font-size:.82rem;color:#aaa;font-weight:600">Share your username so friends can find you!</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-sky">🔍</div>Add a Friend</div>
+      <input class="search-box" type="text" id="friendSearch" placeholder="Search by username..." autocomplete="off" autocorrect="off" autocapitalize="none" />
+      <div id="searchResults"></div>
+    </div>
+    <div class="card" id="pendingCard" style="display:none">
+      <div class="card-title"><div class="icon icon-yellow">⏳</div>Pending Requests <span id="pendingCount" style="background:var(--coral);color:white;border-radius:8px;padding:2px 8px;font-size:.8rem;margin-left:6px"></span></div>
+      <div id="pendingList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-green">🤝</div>My Friends</div>
+      <div id="friendsList"><div style="color:#ccc;text-align:center;padding:16px;font-weight:600">No friends yet - search for someone!</div></div>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottomNav" style="display:none">
+  <button class="nav-btn active" id="navRead" onclick="switchNav('read')">
+    <span class="nav-icon">📚</span>Read
+  </button>
+  <button class="nav-btn" id="navFeed" onclick="switchNav('feed')" style="position:relative">
+    <span class="nav-icon">🌟</span>Feed
+    <span class="nav-badge" id="feedBadge" style="display:none">!</span>
+  </button>
+  <button class="nav-btn" id="navFriends" onclick="switchNav('friends')" style="position:relative">
+    <span class="nav-icon">👥</span>Friends
+    <span class="nav-badge" id="friendsBadge" style="display:none">!</span>
+  </button>
+</div>
+
 </div><!-- end mainApp -->
 
 <!-- PIN MODAL -->
@@ -555,6 +648,7 @@
     <div class="streak-reveal" id="streakReveal">🌟 Story complete!</div>
     <div class="prize-reveal" id="prizeReveal">🍦 You earned: an ice cream cone!</div>
     <p style="font-size:.85rem;color:#bbb;margin-bottom:16px">Show this to a grown-up!</p>
+    <button class="btn btn-sky" id="shareStoryBtn" onclick="shareLastStory()" style="margin-bottom:8px">📢 Share with Friends!</button>
     <button class="btn btn-purple" onclick="closeAndNewStory()">Tell a New Story 🎙️</button>
   </div>
 </div>
@@ -567,24 +661,15 @@ const SUPA_URL='https://scsgvyhqvbjdbyqgdaqj.supabase.co';
 const SUPA_KEY='sb_publishable_IZa375ss-5YzVikrGKmZbA_-Fyue7Gl';
 
 async function supa(method, path, body){
-  // Use the user's session token if available, fall back to anon key
-  let token = SUPA_KEY;
-  try{
-    if(supaAuth){
-      const {data:{session}} = await supaAuth.auth.getSession();
-      if(session?.access_token) token = session.access_token;
-    }
-  }catch(e){}
-
   const res = await fetch(SUPA_URL+'/rest/v1/'+path, {
     method,
     headers:{
       'apikey': SUPA_KEY,
-      'Authorization': 'Bearer '+token,
+      'Authorization': 'Bearer '+SUPA_KEY,
       'Content-Type': 'application/json',
-      'Prefer': method==='POST' ? 'return=representation' : ''
+      'Prefer': method==='POST' ? 'return=representation' : (method==='DELETE'?'':'')
     },
-    body: body ? JSON.stringify(body) : undefined
+    body: (body!==null&&body!==undefined) ? JSON.stringify(body) : undefined
   });
   if(!res.ok){
     const err = await res.text();
@@ -604,7 +689,7 @@ let childHistory = [];
 let allChildren = [];
 
 let words=[],wordIndex=0,recognition=null,isListening=false,isPaused=false;
-let assistedWord=-1,assistedAttempts=0,wordAttempts={};
+let assistedWord=-1,assistedAttempts=0,wordAttempts={},currentStoryText='';
 let ideaText='',ideaRecognition=null,ideaRecording=false;
 let pinEntry='',currentIdeaForHistory='';
 let parentPin='1234';
@@ -765,12 +850,23 @@ async function loginWithCode(code){
 async function enterApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
+  document.getElementById('bottomNav').style.display='flex';
   document.querySelector('.sky').style.display='block';
   document.querySelector('.stars').style.display='block';
-  warmUpMic(); // request mic permission after user interaction
+  warmUpMic();
+  // Load family info including username
+  const famRows=await supa('GET','families?id=eq.'+familyId+'&select=username,parent_approve_friends');
+  if(famRows&&famRows.length>0){
+    myUsername=famRows[0].username||'';
+    parentApproveFriends=famRows[0].parent_approve_friends!==false;
+    const el=document.getElementById('myUsername');
+    if(el)el.textContent=myUsername||'not set';
+  }
   allChildren=await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
   if(allChildren&&allChildren.length>0){await selectChild(allChildren[0]);}
   else{showFirstTimeSetup();}
+  // Check for pending friend requests
+  checkPendingRequests();
 }
 
 async function checkLogin(){
@@ -957,8 +1053,9 @@ async function recordStoryFinished(idea){
     last_read_date:today
   });
 
-  // Add story to history
-  await supa('POST','stories',[{child_id:currentChild.id,idea}]);
+  // Add story to history and save for sharing
+  const newStory=await supa('POST','stories',[{child_id:currentChild.id,family_id:familyId,idea,story_text:currentStoryText,shared:false}]);
+  if(newStory&&newStory.length>0)lastSharedStoryId=newStory[0].id;
 
   // Update local state
   childStats.streak=newStreak;
@@ -1063,7 +1160,7 @@ async function generateStory(){
 // LOAD STORY
 // ============================================================
 function loadStory(text,title){
-  wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};
+  wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};currentStoryText=text;
   if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
   document.getElementById('storyTitle').textContent=title;
   document.getElementById('prizeText').textContent=currentChild.prize||'an ice cream cone!';
@@ -1100,7 +1197,7 @@ function highlightCurrent(){
 // ============================================================
 const SKIP_WORDS=new Set(['a','an','the','and','or','but','in','on','at','to','of','it','is','was','he','she','they','we','i','my','his','her','its','as','up','so','do','be','by','if','no','us','am']);
 function editDistance(a,b){if(a===b)return 0;const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>[i]);for(let j=0;j<=n;j++)dp[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
-function isMatch(s,t){if(!s||!t)return false;if(s===t)return true;return editDistance(s,t)<=(t.length<=4?1:2);}
+function isMatch(s,t){if(!s||!t)return false;if(s===t)return true;if(t.length<=3)return false;return editDistance(s,t)<=1;}
 function skipTinyWords(){while(wordIndex<words.length&&SKIP_WORDS.has(words[wordIndex]))wordIndex++;}
 
 // ============================================================
@@ -1113,47 +1210,33 @@ function startReading(){
   let consumed=0;
   recognition.onstart=()=>{isListening=true;consumed=0;document.getElementById('micDot').classList.add('active');document.getElementById('micStatus').classList.add('listening');document.getElementById('micLabel').textContent='🎤 Listening... Read the highlighted word!';document.getElementById('startBtn').style.display='none';document.getElementById('pauseBtn').style.display='block';skipTinyWords();highlightCurrent();};
   recognition.onresult=(event)=>{
-    let full='';for(let i=0;i<event.results.length;i++)full+=event.results[i][0].transcript;
-    document.getElementById('heardBox').textContent='🎧 Hearing: "'+full.trim().slice(-60)+'"';
-    const spoken=full.slice(consumed).trim().toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
+    // Only use the latest final result to avoid re-processing old speech
+    let newText='';
+    for(let i=event.resultIndex;i<event.results.length;i++){
+      if(event.results[i].isFinal) newText+=event.results[i][0].transcript+' ';
+    }
+    if(!newText.trim())return;
+    document.getElementById('heardBox').textContent='🎧 Hearing: "'+newText.trim().slice(-60)+'"';
+    const spoken=newText.trim().toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
     for(const s of spoken){
       if(wordIndex>=words.length)break;
       // ASSISTED MODE: any speech counts, advance after 2 attempts
       if(assistedWord===wordIndex&&s.length>0){
         assistedAttempts++;
-        consumed=full.length;
         if(assistedAttempts>=2){
           assistedWord=-1;assistedAttempts=0;
-          wordAttempts[wordIndex]=0;
           wordIndex++;skipTinyWords();highlightCurrent();
-          document.getElementById('heardBox').textContent='🎧 Hearing: "'+full.trim().slice(-60)+'"';
           if(wordIndex>=words.length){celebrate();return;}
         } else {
           document.getElementById('heardBox').textContent='👆 One more time - say anything to continue!';
         }
         continue;
       }
-      // NORMAL MODE: match the word
+      // NORMAL MODE: only match current word exactly - no lookahead
       if(isMatch(s,words[wordIndex])){
-        wordIndex++;skipTinyWords();highlightCurrent();consumed=full.length;
-        wordAttempts[wordIndex]=0;
+        wordIndex++;skipTinyWords();highlightCurrent();
         if(wordIndex>=words.length){celebrate();return;}
-        continue;
       }
-      // Track failed attempts for auto-advance (Option 2)
-      if(s.length>0){
-        wordAttempts[wordIndex]=(wordAttempts[wordIndex]||0)+1;
-        if(wordAttempts[wordIndex]>=5){
-          // Auto-advance after 5 failed attempts
-          wordAttempts[wordIndex]=0;
-          assistedWord=-1;assistedAttempts=0;
-          wordIndex++;skipTinyWords();highlightCurrent();consumed=full.length;
-          document.getElementById('heardBox').textContent='🎧 Hearing: "'+full.trim().slice(-60)+'"';
-          if(wordIndex>=words.length){celebrate();return;}
-          continue;
-        }
-      }
-      for(let look=1;look<=1&&(wordIndex+look)<words.length;look++){if(isMatch(s,words[wordIndex+look])){wordIndex+=look+1;skipTinyWords();highlightCurrent();consumed=full.length;wordAttempts[wordIndex]=0;if(wordIndex>=words.length){celebrate();return;}break;}}
     }
   };
   recognition.onerror=(e)=>{
@@ -1462,11 +1545,16 @@ function selectSetupOption(type,value,el){
 
 async function saveFirstTimeSetup(){
   const name=document.getElementById('setupName').value.trim();
+  const username=document.getElementById('setupUsername').value.trim().toLowerCase();
   if(!name){alert('Please enter the readers name!');return;}
+  if(!username){alert('Please choose a username!');return;}
+  if(username.length<3){alert('Username must be at least 3 characters!');return;}
   const prize=document.getElementById('setupPrize').value.trim();
   const btn=document.querySelector('#screenSetup .btn-purple');
   btn.innerHTML='<span class="spinner"></span>Setting up...';btn.disabled=true;
   try{
+    // Save username to families table
+    await supa('PATCH','families?id=eq.'+familyId,{username});
     const created=await supa('POST','children',[{
       family_id:familyId,
       name,
@@ -1480,9 +1568,277 @@ async function saveFirstTimeSetup(){
     btn.innerHTML='Lets Start Reading! 🚀';btn.disabled=false;
   }catch(e){
     console.error(e);
-    alert('Something went wrong, please try again');
+    if(e.message&&e.message.includes('unique'))alert('That username is taken - try another one!');
+    else alert('Something went wrong, please try again');
     btn.innerHTML='Lets Start Reading! 🚀';btn.disabled=false;
   }
+}
+
+// ============================================================
+// SOCIAL STATE
+// ============================================================
+let myUsername='';
+let parentApproveFriends=true;
+let lastSharedStoryId=null;
+
+// ============================================================
+// BOTTOM NAV
+// ============================================================
+function switchNav(tab){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nav'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+  // Hide all screens except reading-related ones
+  if(tab==='read'){
+    showScreen('screenIdea');
+  } else if(tab==='feed'){
+    showScreen('screenFeed');
+    loadFeed();
+  } else if(tab==='friends'){
+    showScreen('screenFriends');
+    loadFriends();
+    setupFriendSearch();
+  }
+}
+
+// ============================================================
+// SHARE STORY
+// ============================================================
+async function shareLastStory(){
+  if(!lastSharedStoryId){alert('No story to share!');return;}
+  const btn=document.getElementById('shareStoryBtn');
+  btn.innerHTML='<span class="spinner"></span>Sharing...';btn.disabled=true;
+  try{
+    // Mark story as shared in Supabase
+    await supa('PATCH','stories?id=eq.'+lastSharedStoryId,{shared:true});
+    btn.innerHTML='✅ Shared!';
+    setTimeout(()=>{btn.innerHTML='📢 Share with Friends!';btn.disabled=false;},2000);
+  }catch(e){
+    btn.innerHTML='📢 Share with Friends!';btn.disabled=false;
+    alert('Could not share - please try again');
+  }
+}
+
+// ============================================================
+// FEED
+// ============================================================
+async function loadFeed(){
+  const feedEl=document.getElementById('feedContent');
+  feedEl.innerHTML='<div style="text-align:center;color:#ccc;padding:20px">Loading...</div>';
+  try{
+    // Get accepted friends
+    const friends=await supa('GET','friends?select=*&or=(requester_id.eq.'+familyId+',receiver_id.eq.'+familyId+')&status=eq.accepted');
+    if(!friends||friends.length===0){
+      feedEl.innerHTML='<div class="feed-empty"><span class="feed-empty-icon">👥</span><p>Add friends to see their stories here!</p></div>';
+      return;
+    }
+    const friendIds=friends.map(f=>f.requester_id===familyId?f.receiver_id:f.requester_id);
+
+    // Get shared stories from friends
+    const stories=await supa('GET','stories?family_id=in.('+friendIds.join(',')+')'+'&shared=eq.true&select=*,families(username,children(name,avatar))&order=read_at.desc&limit=20');
+
+    if(!stories||stories.length===0){
+      feedEl.innerHTML='<div class="feed-empty"><span class="feed-empty-icon">📖</span><p>No shared stories yet - tell your friends to read and share!</p></div>';
+      return;
+    }
+
+    // Get my reactions
+    const myReactions=await supa('GET','reactions?from_family_id=eq.'+familyId+'&select=*');
+    const myReactionMap={};
+    if(myReactions)myReactions.forEach(r=>myReactionMap[r.story_id]=r.emoji);
+
+    // Get all reactions counts
+    const allReactions=await supa('GET','reactions?story_id=in.('+stories.map(s=>s.id).join(',')+')'+'&select=*');
+    const reactionCounts={};
+    if(allReactions)allReactions.forEach(r=>{
+      if(!reactionCounts[r.story_id])reactionCounts[r.story_id]={};
+      reactionCounts[r.story_id][r.emoji]=(reactionCounts[r.story_id][r.emoji]||0)+1;
+    });
+
+    feedEl.innerHTML=stories.map(s=>{
+      const child=s.families&&s.families.children&&s.families.children[0];
+      const avatar=child?child.avatar:'📚';
+      const name=child?child.name:'Friend';
+      const username=s.families?s.families.username:'';
+      const date=new Date(s.read_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const myReact=myReactionMap[s.id];
+      const counts=reactionCounts[s.id]||{};
+      const emojis=['🔥','❤️','⭐'];
+      const reactions=emojis.map(e=>`<button class="reaction-btn${myReact===e?' reacted':''}" onclick="reactToStory('${s.id}','${e}',this)">${e} ${counts[e]||''}</button>`).join('');
+      return `<div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-avatar">${avatar}</div>
+          <div><div class="feed-name">${name}</div><div class="feed-time">@${username} · ${date}</div></div>
+        </div>
+        <div class="feed-idea">📖 "${s.idea}"</div>
+        <div class="feed-reactions">${reactions}</div>
+      </div>`;
+    }).join('');
+    // Clear badge
+    document.getElementById('feedBadge').style.display='none';
+  }catch(e){
+    console.error(e);
+    feedEl.innerHTML='<div style="color:var(--coral);text-align:center;padding:16px">Could not load feed</div>';
+  }
+}
+
+async function reactToStory(storyId,emoji,btn){
+  try{
+    // Toggle reaction - if same emoji remove it, otherwise upsert
+    const existing=await supa('GET','reactions?story_id=eq.'+storyId+'&from_family_id=eq.'+familyId+'&select=*');
+    if(existing&&existing.length>0){
+      if(existing[0].emoji===emoji){
+        await supa('DELETE','reactions?id=eq.'+existing[0].id,null);
+      } else {
+        await supa('PATCH','reactions?id=eq.'+existing[0].id,{emoji});
+      }
+    } else {
+      await supa('POST','reactions',[{story_id:storyId,from_family_id:familyId,emoji}]);
+    }
+    loadFeed(); // refresh
+  }catch(e){console.error(e);}
+}
+
+// ============================================================
+// FRIENDS
+// ============================================================
+async function loadFriends(){
+  const el=document.getElementById('friendsList');
+  el.innerHTML='<div style="color:#ccc;text-align:center;padding:16px;font-weight:600">Loading...</div>';
+  try{
+    const friends=await supa('GET','friends?select=*,requester:requester_id(username,children(name,avatar)),receiver:receiver_id(username,children(name,avatar))&or=(requester_id.eq.'+familyId+',receiver_id.eq.'+familyId+')&status=eq.accepted');
+    if(!friends||friends.length===0){
+      el.innerHTML='<div style="color:#ccc;text-align:center;padding:16px;font-weight:600">No friends yet - search for someone!</div>';
+      return;
+    }
+    el.innerHTML=friends.map(f=>{
+      const isMeRequester=f.requester_id===familyId;
+      const other=isMeRequester?f.receiver:f.requester;
+      const child=other&&other.children&&other.children[0];
+      const avatar=child?child.avatar:'👤';
+      const name=child?child.name:'Friend';
+      const username=other?other.username:'';
+      return `<div class="friend-item">
+        <div class="friend-avatar">${avatar}</div>
+        <div class="friend-info"><div class="friend-name">${name}</div><div class="friend-username">@${username}</div></div>
+        <div class="friend-action"><button class="pill-btn pill-remove" onclick="removeFriend('${f.id}')">Remove</button></div>
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML='<div style="color:var(--coral);text-align:center;padding:16px">Could not load friends</div>';}
+}
+
+async function checkPendingRequests(){
+  try{
+    const pending=await supa('GET','friends?receiver_id=eq.'+familyId+'&status=eq.pending&select=*');
+    const count=pending?pending.length:0;
+    const badge=document.getElementById('friendsBadge');
+    const pendingCard=document.getElementById('pendingCard');
+    if(count>0){
+      badge.style.display='block';badge.textContent=count;
+      if(pendingCard){
+        pendingCard.style.display='block';
+        document.getElementById('pendingCount').textContent=count;
+        loadPendingRequests(pending);
+      }
+    } else {
+      badge.style.display='none';
+      if(pendingCard)pendingCard.style.display='none';
+    }
+  }catch(e){}
+}
+
+async function loadPendingRequests(pending){
+  const el=document.getElementById('pendingList');
+  if(!pending||pending.length===0){el.innerHTML='';return;}
+  // Get requester info
+  const ids=pending.map(p=>p.requester_id);
+  const requesters=await supa('GET','families?id=in.('+ids.join(',')+')'+'&select=username,children(name,avatar)');
+  el.innerHTML=pending.map(p=>{
+    const req=requesters&&requesters.find(r=>r.id===p.requester_id);
+    const child=req&&req.children&&req.children[0];
+    const avatar=child?child.avatar:'👤';
+    const name=child?child.name:'Friend';
+    const username=req?req.username:'';
+    const approveBtn=parentApproveFriends?
+      `<button class="pill-btn pill-accept" onclick="acceptFriend('${p.id}')">Accept</button><button class="pill-btn pill-decline" onclick="declineFriend('${p.id}')">Decline</button>`:
+      `<button class="pill-btn pill-accept" onclick="acceptFriend('${p.id}')">Accept</button><button class="pill-btn pill-decline" onclick="declineFriend('${p.id}')">Decline</button>`;
+    return `<div class="friend-item">
+      <div class="friend-avatar">${avatar}</div>
+      <div class="friend-info"><div class="friend-name">${name}</div><div class="friend-username">@${username} wants to be friends!</div></div>
+      <div class="friend-action">${approveBtn}</div>
+    </div>`;
+  }).join('');
+}
+
+function setupFriendSearch(){
+  const input=document.getElementById('friendSearch');
+  const el=document.getElementById('searchResults');
+  let timer;
+  input.oninput=()=>{
+    clearTimeout(timer);
+    const val=input.value.trim().toLowerCase();
+    if(val.length<2){el.innerHTML='';return;}
+    timer=setTimeout(async()=>{
+      try{
+        const results=await supa('GET','families?username=ilike.*'+val+'*&select=username,id,children(name,avatar)&limit=5');
+        if(!results||results.length===0){el.innerHTML='<p style="color:#ccc;text-align:center;font-weight:600;padding:10px">No users found</p>';return;}
+        el.innerHTML=results.filter(r=>r.id!==familyId).map(r=>{
+          const child=r.children&&r.children[0];
+          const avatar=child?child.avatar:'👤';
+          const name=child?child.name:'Reader';
+          return `<div class="friend-item">
+            <div class="friend-avatar">${avatar}</div>
+            <div class="friend-info"><div class="friend-name">${name}</div><div class="friend-username">@${r.username}</div></div>
+            <div class="friend-action"><button class="pill-btn pill-accept" onclick="sendFriendRequest('${r.id}',this)">Add +</button></div>
+          </div>`;
+        }).join('');
+      }catch(e){el.innerHTML='<p style="color:var(--coral);text-align:center;padding:10px">Search error</p>';}
+    },400);
+  };
+  loadFriends();
+  checkPendingRequests();
+}
+
+async function sendFriendRequest(receiverId,btn){
+  btn.innerHTML='Sending...';btn.disabled=true;
+  try{
+    await supa('POST','friends',[{requester_id:familyId,receiver_id:receiverId,status:'pending'}]);
+    btn.innerHTML='Sent! ✅';
+  }catch(e){
+    btn.innerHTML='Add +';btn.disabled=false;
+    if(e.message&&e.message.includes('unique'))btn.innerHTML='Already sent';
+    else alert('Could not send request');
+  }
+}
+
+async function acceptFriend(friendId){
+  try{
+    await supa('PATCH','friends?id=eq.'+friendId,{status:'accepted'});
+    checkPendingRequests();
+    loadFriends();
+  }catch(e){alert('Could not accept request');}
+}
+
+async function declineFriend(friendId){
+  try{
+    await supa('DELETE','friends?id=eq.'+friendId,null);
+    checkPendingRequests();
+  }catch(e){alert('Could not decline request');}
+}
+
+async function removeFriend(friendId){
+  if(!confirm('Remove this friend?'))return;
+  try{
+    await supa('DELETE','friends?id=eq.'+friendId,null);
+    loadFriends();
+  }catch(e){alert('Could not remove friend');}
+}
+
+function copyUsername(){
+  navigator.clipboard.writeText(myUsername).then(()=>{
+    const btn=document.querySelector('.username-display .pill-btn');
+    const orig=btn.innerHTML;btn.innerHTML='Copied! ✅';
+    setTimeout(()=>btn.innerHTML=orig,2000);
+  }).catch(()=>alert('Your username: '+myUsername));
 }
 
 // ============================================================
