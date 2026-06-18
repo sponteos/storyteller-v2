@@ -462,11 +462,11 @@
         <div class="progress-label" id="progressLabel">0% read</div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" id="prizeCard">
       <div class="card-title"><div class="icon icon-yellow">🎁</div>Your Prize</div>
       <div class="prize-display">
-        <div class="prize-emoji-display" id="prizeEmojiDisplay">🍦</div>
-        <div>Finish reading to earn: <strong id="prizeText">an ice cream cone!</strong></div>
+        <div class="prize-emoji-display" id="prizeEmojiDisplay">🎁</div>
+        <div>Finish reading to earn: <strong id="prizeText"></strong></div>
       </div>
     </div>
     <div class="card"><button class="btn btn-ghost" onclick="goToIdeaScreen()">← New Story Idea</button></div>
@@ -477,6 +477,14 @@
     <div class="card">
       <div class="card-title"><div class="icon icon-purple">📊</div>Parent Dashboard</div>
       <div id="dashboardContent"><div style="text-align:center;color:#ccc;padding:20px">Loading...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-yellow">✏️</div>Edit Reader</div>
+      <div id="editReaderSection">
+        <div class="avatar-picker" id="settingsAvatarPicker" style="margin-bottom:14px"></div>
+        <input class="setting-input" type="text" id="settingsChildNameInput" placeholder="Reader name..." autocomplete="off" autocapitalize="words" style="margin-bottom:14px" />
+        <button class="btn btn-sky" onclick="saveReaderProfile()">Save Profile ✅</button>
+      </div>
     </div>
     <div class="card">
       <div class="card-title"><div class="icon icon-purple">⚙️</div>Reader Settings</div>
@@ -1145,9 +1153,15 @@ function loadStory(text,title){
   wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};currentStoryText=text;
   if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
   document.getElementById('storyTitle').textContent=title;
-  document.getElementById('prizeText').textContent=currentChild.prize||'an ice cream cone!';
+  const prize=currentChild&&currentChild.prize?currentChild.prize.trim():'';
+  const prizeCard=document.getElementById('prizeCard');
+  if(prizeCard)prizeCard.style.display=prize?'block':'none';
+  document.getElementById('prizeText').textContent=prize;
   document.getElementById('prizeEmojiDisplay').textContent='🎁';
-  document.getElementById('prizeReveal').textContent='🎁 You earned: '+(currentChild.prize||'an ice cream cone!');
+  const prz=currentChild&&currentChild.prize?currentChild.prize.trim():'';
+  const prizeRevealEl=document.getElementById('prizeReveal');
+  prizeRevealEl.style.display=prz?'block':'none';
+  prizeRevealEl.textContent=prz?'🎁 You earned: '+prz:'';
   words=text.split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'').toLowerCase()).filter(w=>w.length>0);
   document.getElementById('storyDisplay').innerHTML=text.split(/\s+/).map((w,i)=>`<span class="word" id="word-${i}" onclick="hearWord(${i})">${w} </span>`).join('');
   highlightCurrent();
@@ -1289,6 +1303,43 @@ async function openParentSettings(){
   document.getElementById('pinInput').value='';
   await loadDashboard();
   loadSettingsChildPicker();
+  loadEditReaderSection();
+}
+
+function loadEditReaderSection(){
+  if(!currentChild)return;
+  // Populate name
+  document.getElementById('settingsChildNameInput').value=currentChild.name||'';
+  // Populate avatar picker
+  const picker=document.getElementById('settingsAvatarPicker');
+  picker.innerHTML=AVATARS.map(a=>`<button class="avatar-opt${a===currentChild.avatar?' selected':''}" onclick="pickSettingsAvatar('${a}',this)">${a}</button>`).join('');
+  editAvatar=currentChild.avatar||AVATARS[0];
+}
+
+function pickSettingsAvatar(a,el){
+  editAvatar=a;
+  document.querySelectorAll('#settingsAvatarPicker .avatar-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function saveReaderProfile(){
+  const name=document.getElementById('settingsChildNameInput').value.trim();
+  if(!name){alert('Please enter a name!');return;}
+  if(!currentChild)return;
+  const btn=document.querySelector('#editReaderSection .btn-sky');
+  btn.innerHTML='<span class="spinner"></span>Saving...';btn.disabled=true;
+  try{
+    await supa('PATCH','children?id=eq.'+currentChild.id,{name,avatar:editAvatar});
+    currentChild.name=name;currentChild.avatar=editAvatar;
+    const idx=allChildren.findIndex(c=>c.id===currentChild.id);
+    if(idx>=0){allChildren[idx].name=name;allChildren[idx].avatar=editAvatar;}
+    document.getElementById('headerSub').textContent='Reading as '+name+' '+editAvatar;
+    btn.innerHTML='Saved! ✅';
+    setTimeout(()=>{btn.innerHTML='Save Profile ✅';btn.disabled=false;},1500);
+  }catch(e){
+    alert('Something went wrong, please try again');
+    btn.innerHTML='Save Profile ✅';btn.disabled=false;
+  }
 }
 
 async function loadDashboard(){
