@@ -309,7 +309,6 @@
       <div class="auth-tabs">
         <button class="auth-tab active" onclick="switchAuthTab('login',this)">Log In</button>
         <button class="auth-tab" onclick="switchAuthTab('signup',this)">Sign Up</button>
-        <button class="auth-tab" onclick="switchAuthTab('code',this)">Family Code</button>
       </div>
 
       <!-- LOG IN TAB -->
@@ -340,16 +339,7 @@
         <button class="btn btn-purple" onclick="submitEmailSignup()" style="width:100%">Create Account</button>
       </div>
 
-      <!-- FAMILY CODE TAB -->
-      <div class="auth-panel" id="panelCode" style="display:none">
-        <p style="color:#888;font-weight:600;font-size:.9rem;margin-bottom:16px">Ask a grown-up for your family code to get started</p>
-        <input class="login-input" type="text" id="codeInput" placeholder="Enter your family code"
-          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-          oninput="this.value=this.value.toUpperCase()"
-          onkeydown="if(event.key==='Enter')submitCode()" />
-        <div class="login-error" id="codeError"></div>
-        <button class="btn btn-purple" onclick="submitCode()" style="width:100%;margin-top:12px">Lets Read! ✨</button>
-      </div>
+
 
     </div>
   </div>
@@ -489,13 +479,7 @@
       <div id="dashboardContent"><div style="text-align:center;color:#ccc;padding:20px">Loading...</div></div>
     </div>
     <div class="card">
-      <div class="card-title"><div class="icon icon-yellow">👤</div>Current Reader</div>
-      <div class="option-group" id="settingsChildPicker" style="margin-bottom:16px"></div>
-      <button class="btn btn-sky" onclick="openAddChildModal()" style="margin-top:4px">➕ Add New Reader</button>
-    </div>
-    <div class="card">
       <div class="card-title"><div class="icon icon-purple">⚙️</div>Reader Settings</div>
-      <p style="font-size:.85rem;color:#aaa;font-weight:600;margin-bottom:16px">Editing settings for: <strong id="settingsChildName">-</strong></p>
       <div id="childSettingsForm">
         <div class="setting-row">
           <div class="setting-label">📚 Reading Level</div>
@@ -886,11 +870,6 @@ async function checkLogin(){
   // Check for existing session
   const {data:{session}}=await supaAuth.auth.getSession();
   if(session){await handleAuthUser(session.user);return;}
-  // Check for saved family code
-  try{
-    const saved=localStorage.getItem('sr_family_code');
-    if(saved){await loginWithCode(saved);return;}
-  }catch(e){}
   showLoginScreen();
   // Listen for auth state changes
   supaAuth.auth.onAuthStateChange(async(event,session)=>{
@@ -1137,7 +1116,7 @@ async function generateStory(){
     const response=await fetch('https://frosty-meadow-2088.steve-jaffe.workers.dev',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-6',max_tokens:1500,
+        model:'claude-sonnet-4-6' /* UPDATE THIS: check latest model at console.anthropic.com */,max_tokens:1500,
         system:`You are a childrens story writer. Write a short story at a ${currentChild.reading_level} reading level. Rules: Exactly ${wordCount} words long. Fun, adventurous, with a satisfying ending. Vocabulary appropriate for ${currentChild.reading_level}. Do NOT include a title. Return ONLY the story text, nothing else.`,
         messages:[{role:'user',content:`Write a childrens story based on this idea: "${ideaText}"`}]
       })
