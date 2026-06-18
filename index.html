@@ -1144,7 +1144,10 @@ async function generateStory(){
     });
     clearInterval(interval);
     if(!response.ok)throw new Error(response.status);
-    const data=JSON.parse(await response.text());
+    const rawText=await response.text();
+    console.log('API response:', rawText.slice(0,200));
+    const data=JSON.parse(rawText);
+    if(!data||!data.content||!data.content[0])throw new Error('Invalid response: '+rawText.slice(0,100));
     const storyText=data.content[0].text.trim();
     const title='The Story of '+ideaText.split(' ').slice(0,5).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
     loadStory(storyText,title);showScreen('screenReading');
