@@ -920,7 +920,7 @@ async function loadChildPicker(){
 
 async function selectChild(child){
   currentChild=child;
-  document.getElementById('headerSub').textContent='Reading as '+child.name+' '+child.avatar;
+  document.getElementById('headerSub').textContent='Reading as '+child.name;
 
   // Load stats
   const rows=await supa('GET','reading_stats?child_id=eq.'+child.id+'&select=*');
@@ -1157,7 +1157,6 @@ function loadStory(text,title){
   const prizeCard=document.getElementById('prizeCard');
   if(prizeCard)prizeCard.style.display=prize?'block':'none';
   document.getElementById('prizeText').textContent=prize;
-  document.getElementById('prizeEmojiDisplay').textContent='🎁';
   const prz=currentChild&&currentChild.prize?currentChild.prize.trim():'';
   const prizeRevealEl=document.getElementById('prizeReveal');
   prizeRevealEl.style.display=prz?'block':'none';
@@ -1302,8 +1301,14 @@ async function openParentSettings(){
   showScreen('screenParent');
   document.getElementById('pinInput').value='';
   await loadDashboard();
-  loadSettingsChildPicker();
   loadEditReaderSection();
+  // Pre-populate settings from currentChild
+  if(currentChild){
+    document.querySelectorAll('#levelOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(currentChild.reading_level.split(' ')[0])));
+    document.querySelectorAll('#lengthOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().startsWith(MINUTES[currentChild.story_length]+'')));
+    document.getElementById('prizeInput').value=currentChild.prize||'';
+    updatePrizePreview();
+  }
 }
 
 function loadEditReaderSection(){
@@ -1333,7 +1338,7 @@ async function saveReaderProfile(){
     currentChild.name=name;currentChild.avatar=editAvatar;
     const idx=allChildren.findIndex(c=>c.id===currentChild.id);
     if(idx>=0){allChildren[idx].name=name;allChildren[idx].avatar=editAvatar;}
-    document.getElementById('headerSub').textContent='Reading as '+name+' '+editAvatar;
+    document.getElementById('headerSub').textContent='Reading as '+name;
     btn.innerHTML='Saved! ✅';
     setTimeout(()=>{btn.innerHTML='Save Profile ✅';btn.disabled=false;},1500);
   }catch(e){
@@ -1391,7 +1396,7 @@ function selectSettingsChild(id,el){
   if(!child)return;
   // Update current child WITHOUT navigating away from settings
   currentChild=child;
-  document.getElementById('headerSub').textContent='Reading as '+child.name+' '+child.avatar;
+  document.getElementById('headerSub').textContent='Reading as '+child.name;
   const nameEl=document.getElementById('settingsChildName');
   if(nameEl)nameEl.textContent=child.name;
   // Update settings form
@@ -1415,7 +1420,7 @@ function selectOption(type,value,el){
 function updatePrizePreview(){const val=document.getElementById('prizeInput').value.trim();document.getElementById('prizePreview').textContent=val?'🎁 Prize: '+val:'🎁 Prize will show here';}
 
 async function saveChildSettings(){
-  if(!settingsChildId){alert('Please select a child first!');return;}
+  if(!currentChild){alert('No reader found - please set up your reader first!');return;}
   const levelEl=document.querySelector('#levelOptions .option-btn.selected');
   const lengthEl=document.querySelector('#lengthOptions .option-btn.selected');
   const prize=document.getElementById('prizeInput').value.trim();
@@ -1423,16 +1428,15 @@ async function saveChildSettings(){
   const reading_level=levelEl.textContent.trim().toLowerCase();
   const lengthText=lengthEl.textContent.trim();
   const story_length=lengthText.startsWith('5')?'short':lengthText.startsWith('10')?'medium':lengthText.startsWith('15')?'long':'vlong';
+  const settingsChildId=currentChild.id;
 
   const btn=document.querySelector('#screenParent .btn-purple');
   btn.innerHTML='<span class="spinner"></span>Saving...';btn.disabled=true;
   try{
-    await supa('PATCH','children?id=eq.'+settingsChildId,{reading_level,story_length,prize:prize||'an ice cream cone!'});
-    // Update local allChildren
-    const idx=allChildren.findIndex(c=>c.id===settingsChildId);
-    if(idx>=0){allChildren[idx].reading_level=reading_level;allChildren[idx].story_length=story_length;allChildren[idx].prize=prize||'an ice cream cone!';}
-    // Update currentChild if same
-    if(currentChild&&currentChild.id===settingsChildId){currentChild.reading_level=reading_level;currentChild.story_length=story_length;currentChild.prize=prize||'an ice cream cone!';}
+    await supa('PATCH','children?id=eq.'+currentChild.id,{reading_level,story_length,prize:prize||''});
+    currentChild.reading_level=reading_level;currentChild.story_length=story_length;currentChild.prize=prize||'';
+    const idx=allChildren.findIndex(c=>c.id===currentChild.id);
+    if(idx>=0){allChildren[idx].reading_level=reading_level;allChildren[idx].story_length=story_length;allChildren[idx].prize=prize||'';}
     btn.innerHTML='✅ Saved!';setTimeout(()=>{btn.innerHTML='💾 Save Child Settings';btn.disabled=false;},1500);
   }catch(e){
     alert('Could not save - please try again');
@@ -1522,7 +1526,7 @@ async function saveEditChild(){
     if(idx>=0){allChildren[idx].name=name;allChildren[idx].avatar=editAvatar;}
     if(currentChild&&currentChild.id===editChildId){
       currentChild.name=name;currentChild.avatar=editAvatar;
-      document.getElementById('headerSub').textContent='Reading as '+name+' '+editAvatar;
+      document.getElementById('headerSub').textContent='Reading as '+name;
     }
     closeEditChildModal();
     loadSettingsChildPicker();
