@@ -517,6 +517,16 @@
       </div>
     </div>
     <div class="card">
+      <div class="card-title"><div class="icon icon-sky">🔤</div>Username</div>
+      <p style="font-size:.85rem;color:#aaa;font-weight:600;margin-bottom:10px">Friends use this to find you</p>
+      <div class="username-display" id="currentUsernameDisplay">
+        <span>@<span id="currentUsernameText">not set</span></span>
+      </div>
+      <input class="setting-input" type="text" id="settingsUsername" placeholder="e.g. emma_reads, jack123" autocomplete="off" autocapitalize="none" autocorrect="off" style="margin-top:10px;text-transform:lowercase" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')" />
+      <p style="font-size:.78rem;color:#bbb;font-weight:600;margin-top:6px">Only letters, numbers and underscores. At least 3 characters.</p>
+      <button class="btn btn-sky" onclick="saveUsername()" style="margin-top:10px">Save Username</button>
+    </div>
+    <div class="card">
       <div class="card-title"><div class="icon icon-coral">🔒</div>Parent PIN</div>
       <input class="setting-input" type="password" id="pinInput" placeholder="Enter a new 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" />
       <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN. Default is 1234.</p>
@@ -1305,6 +1315,9 @@ async function openParentSettings(){
   document.getElementById('pinInput').value='';
   await loadDashboard();
   loadEditReaderSection();
+  // Show current username
+  const unEl=document.getElementById('currentUsernameText');
+  if(unEl)unEl.textContent=myUsername||'not set';
   // Pre-populate settings from currentChild
   if(currentChild){
     document.querySelectorAll('#levelOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(currentChild.reading_level.split(' ')[0])));
@@ -1544,16 +1557,42 @@ async function saveEditChild(){
 // SETTINGS NAVIGATION
 // ============================================================
 function returnFromSettings(){
-  showScreen(previousScreen);
-  // Restore nav tab highlight
-  if(previousScreen==='screenFeed') switchNav('feed');
-  else if(previousScreen==='screenFriends') switchNav('friends');
-  else switchNav('read');
+  // Restore nav highlight without reloading the screen
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(previousScreen==='screenFeed') document.getElementById('navFeed').classList.add('active');
+  else if(previousScreen==='screenFriends') document.getElementById('navFriends').classList.add('active');
+  else document.getElementById('navRead').classList.add('active');
+  // Just show the previous screen without resetting it
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(previousScreen).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // ============================================================
 // LOGOUT
 // ============================================================
+async function saveUsername(){
+  const username=document.getElementById('settingsUsername').value.trim().toLowerCase();
+  if(!username){alert('Please enter a username');return;}
+  if(username.length<3){alert('Username must be at least 3 characters');return;}
+  const btn=document.querySelector('#settingsUsername').nextElementSibling.nextElementSibling;
+  btn.innerHTML='<span class="spinner"></span>Saving...';btn.disabled=true;
+  try{
+    await supa('PATCH','families?id=eq.'+familyId,{username});
+    myUsername=username;
+    document.getElementById('currentUsernameText').textContent=username;
+    const myUsernameEl=document.getElementById('myUsername');
+    if(myUsernameEl)myUsernameEl.textContent=username;
+    document.getElementById('settingsUsername').value='';
+    btn.innerHTML='Saved! ✅';
+    setTimeout(()=>{btn.innerHTML='Save Username';btn.disabled=false;},1500);
+  }catch(e){
+    if(e.message&&e.message.includes('unique'))alert('That username is taken - try another one!');
+    else alert('Could not save username');
+    btn.innerHTML='Save Username';btn.disabled=false;
+  }
+}
+
 async function logOut(){
   if(!confirm('Are you sure you want to log out?'))return;
   try{
