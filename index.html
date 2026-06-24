@@ -522,7 +522,7 @@
       <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN. Default is 1234.</p>
       <button class="btn btn-sky" onclick="savePin()" style="margin-top:12px">Save PIN</button>
     </div>
-    <button class="btn btn-ghost" onclick="showScreen('screenIdea')">← Back to App</button>
+    <button class="btn btn-ghost" onclick="returnFromSettings()">← Back to App</button>
     <button class="btn btn-ghost" onclick="logOut()" style="margin-top:8px;color:var(--coral)">🚪 Log Out</button>
   </div>
 
@@ -682,6 +682,7 @@ let allChildren = [];
 
 let words=[],wordIndex=0,recognition=null,isListening=false,isPaused=false;
 let assistedWord=-1,assistedAttempts=0,wordAttempts={},currentStoryText='';
+let previousScreen='screenIdea';
 let ideaText='',ideaRecognition=null,ideaRecording=false;
 let pinEntry='',currentIdeaForHistory='';
 let parentPin='1234';
@@ -724,6 +725,8 @@ function savePin(){
 // SCREENS
 // ============================================================
 function showScreen(id){
+  const current=document.querySelector('.screen.active');
+  if(current&&current.id!=='screenParent')previousScreen=current.id;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1538,6 +1541,17 @@ async function saveEditChild(){
 }
 
 // ============================================================
+// SETTINGS NAVIGATION
+// ============================================================
+function returnFromSettings(){
+  showScreen(previousScreen);
+  // Restore nav tab highlight
+  if(previousScreen==='screenFeed') switchNav('feed');
+  else if(previousScreen==='screenFriends') switchNav('friends');
+  else switchNav('read');
+}
+
+// ============================================================
 // LOGOUT
 // ============================================================
 async function logOut(){
@@ -1663,7 +1677,7 @@ async function loadFeed(){
   feedEl.innerHTML='<div style="text-align:center;color:#ccc;padding:20px">Loading...</div>';
   try{
     // Get accepted friends
-    const friends=await supa('GET','friends?select=*&or=(requester_id.eq.'+familyId+',receiver_id.eq.'+familyId+')&status=eq.accepted');
+    const friends=await supa('GET','friends?or=(requester_id.eq.'+familyId+',receiver_id.eq.'+familyId+')&status=eq.accepted&select=*');
     if(!friends||friends.length===0){
       feedEl.innerHTML='<div class="feed-empty"><span class="feed-empty-icon">👥</span><p>Add friends to see their stories here!</p></div>';
       return;
@@ -1742,7 +1756,7 @@ async function loadFriends(){
   const el=document.getElementById('friendsList');
   el.innerHTML='<div style="color:#ccc;text-align:center;padding:16px;font-weight:600">Loading...</div>';
   try{
-    const friends=await supa('GET','friends?select=*,requester:requester_id(username,children(name,avatar)),receiver:receiver_id(username,children(name,avatar))&or=(requester_id.eq.'+familyId+',receiver_id.eq.'+familyId+')&status=eq.accepted');
+    const friends=await supa('GET','friends?or=(requester_id.eq.'+familyId+',receiver_id.eq.'+familyId+')&status=eq.accepted&select=id,requester_id,receiver_id');
     if(!friends||friends.length===0){
       el.innerHTML='<div style="color:#ccc;text-align:center;padding:16px;font-weight:600">No friends yet - search for someone!</div>';
       return;
