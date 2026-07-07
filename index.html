@@ -63,6 +63,7 @@
   .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 
   /* LOGIN */
+  #resetScreen{min-height:100vh;background:linear-gradient(160deg,#B8E4FF 0%,#E8F6FF 40%,#FFFBF0 100%);position:relative;overflow:hidden}
   #loginScreen{min-height:100vh;background:linear-gradient(160deg,#B8E4FF 0%,#E8F6FF 40%,#FFFBF0 100%);position:relative;overflow:hidden}
   #loginScreen::before{content:'☁️';position:absolute;font-size:5rem;top:5%;left:-2%;opacity:.4;animation:drift 28s linear infinite}
   #loginScreen::after{content:'☁️';position:absolute;font-size:3.5rem;top:15%;animation:drift 35s linear infinite;animation-delay:-10s;opacity:.3}
@@ -341,6 +342,22 @@
 
 
 
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD RESET SCREEN -->
+<div id="resetScreen" style="display:none">
+  <div class="login-sun"></div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <span class="login-emoji">🔐</span>
+      <h2>Set New Password</h2>
+      <p>Enter your new password below</p>
+      <input class="setting-input" type="password" id="newPassword" placeholder="New password (min 6 characters)" autocomplete="new-password" style="margin-bottom:10px" />
+      <input class="setting-input" type="password" id="confirmPassword" placeholder="Confirm new password" autocomplete="new-password" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')submitNewPassword()" />
+      <div class="login-error" id="resetError"></div>
+      <button class="btn btn-purple" onclick="submitNewPassword()" style="width:100%;margin-top:4px">Save New Password</button>
     </div>
   </div>
 </div>
@@ -891,26 +908,25 @@ async function enterApp(){
 
 async function checkLogin(){
   await loadSupabaseClient();
-  // If URL has # it means we're returning from OAuth - let Supabase process it
-  if(window.location.hash&&window.location.hash.includes('access_token')){
-    // Supabase auto-processes the hash, just wait for auth state change
-    supaAuth.auth.onAuthStateChange(async(event,session)=>{
-      if(event==='SIGNED_IN'&&session){
-        // Clean up URL
-        window.history.replaceState(null,'',window.location.pathname);
-        await handleAuthUser(session.user);
-      }
-    });
-    return;
-  }
+  // Listen for auth state changes first
+  supaAuth.auth.onAuthStateChange(async(event,session)=>{
+    console.log('Auth event:', event);
+    if(event==='PASSWORD_RECOVERY'){
+      // Show password reset screen
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('resetScreen').style.display='block';
+      document.querySelector('.sky').style.display='none';
+      document.querySelector('.stars').style.display='none';
+    } else if(event==='SIGNED_IN'&&session){
+      document.getElementById('resetScreen').style.display='none';
+      window.history.replaceState(null,'',window.location.pathname);
+      await handleAuthUser(session.user);
+    }
+  });
   // Check for existing session
   const {data:{session}}=await supaAuth.auth.getSession();
   if(session){await handleAuthUser(session.user);return;}
   showLoginScreen();
-  // Listen for auth state changes
-  supaAuth.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session){await handleAuthUser(session.user);}
-  });
 }
 
 // ============================================================
@@ -1605,6 +1621,26 @@ async function saveUsername(){
     if(e.message&&e.message.includes('unique'))alert('That username is taken - try another one!');
     else alert('Could not save username');
     btn.innerHTML='Save Username';btn.disabled=false;
+  }
+}
+
+async function submitNewPassword(){
+  const newPwd=document.getElementById('newPassword').value;
+  const confirmPwd=document.getElementById('confirmPassword').value;
+  const errEl=document.getElementById('resetError');
+  if(!newPwd||newPwd.length<6){errEl.textContent='Password must be at least 6 characters';return;}
+  if(newPwd!==confirmPwd){errEl.textContent='Passwords do not match';return;}
+  const btn=document.querySelector('#resetScreen .btn-purple');
+  btn.innerHTML='<span class="spinner"></span>Saving...';btn.disabled=true;
+  try{
+    const {error}=await supaAuth.auth.updateUser({password:newPwd});
+    if(error)throw error;
+    alert('Password updated successfully! You are now logged in.');
+    document.getElementById('resetScreen').style.display='none';
+    // Auth state change will handle logging in
+  }catch(e){
+    errEl.textContent=e.message||'Could not update password, please try again';
+    btn.innerHTML='Save New Password';btn.disabled=false;
   }
 }
 
