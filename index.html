@@ -764,12 +764,25 @@ function switchAuthTab(tab,el){
   document.getElementById('panel'+tab.charAt(0).toUpperCase()+tab.slice(1)).style.display='block';
 }
 
-function showForgotPassword(){
+async function showForgotPassword(){
   const email=document.getElementById('loginEmail').value.trim();
   if(!email){alert('Please enter your email address first');return;}
-  supaAuth.auth.resetPasswordForEmail(email,{redirectTo:'https://storyreader.app'})
-    .then(()=>alert('Password reset email sent! Check your inbox.'))
-    .catch(e=>alert('Error: '+e.message));
+  if(!supaAuth){
+    alert('Please wait a moment and try again');return;
+  }
+  const btn=document.querySelector('#panelLogin .link-btn');
+  const orig=btn.textContent;
+  btn.textContent='Sending...';
+  try{
+    const {error}=await supaAuth.auth.resetPasswordForEmail(email,{redirectTo:'https://storyreader.app'});
+    if(error)throw error;
+    alert('Password reset email sent to '+email+'! Check your inbox.');
+    btn.textContent=orig;
+  }catch(e){
+    console.error('Reset error:',e);
+    alert('Error sending reset email: '+(e.message||'please try again'));
+    btn.textContent=orig;
+  }
 }
 
 async function loginWithGoogle(){
@@ -828,6 +841,8 @@ function showLoginScreen(){
   document.getElementById('mainApp').style.display='none';
   document.querySelector('.sky').style.display='none';
   document.querySelector('.stars').style.display='none';
+  // Make sure supaAuth is loaded
+  if(!supaAuth)loadSupabaseClient();
 }
 
 async function submitCode(){
