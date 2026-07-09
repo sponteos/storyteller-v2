@@ -545,8 +545,9 @@
     </div>
     <div class="card">
       <div class="card-title"><div class="icon icon-coral">🔒</div>Parent PIN</div>
+      <div id="noPinBanner" style="background:linear-gradient(135deg,#FFF0F0,#FFE8E8);border:2px solid var(--coral);border-radius:14px;padding:12px 14px;font-size:.88rem;font-weight:700;color:var(--coral);margin-bottom:14px;display:none">⚠️ No PIN set — anyone can access settings! Set one below.</div>
       <input class="setting-input" type="password" id="pinInput" placeholder="Enter a new 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" />
-      <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN. Default is 1234.</p>
+      <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN.</p>
       <button class="btn btn-sky" onclick="savePin()" style="margin-top:12px">Save PIN</button>
     </div>
     <button class="btn btn-ghost" onclick="returnFromSettings()">← Back to App</button>
@@ -712,7 +713,7 @@ let assistedWord=-1,assistedAttempts=0,wordAttempts={},currentStoryText='';
 let previousScreen='screenIdea';
 let ideaText='',ideaRecognition=null,ideaRecording=false;
 let pinEntry='',currentIdeaForHistory='';
-let parentPin='1234';
+let parentPin='';
 
 const BADGES=[
   {count:1, icon:'⭐',name:'First Story!', desc:'You read your very first story!'},
@@ -735,7 +736,7 @@ function getWordCount(){
 
 // PIN stored in localStorage per family
 function loadPin(){
-  try{parentPin=localStorage.getItem('sr_pin_'+familyId)||'1234';}catch(e){}
+  try{parentPin=localStorage.getItem('sr_pin_'+familyId)||'';}catch(e){}
 }
 function savePin(){
   const pn=document.getElementById('pinInput').value.trim();
@@ -1327,7 +1328,14 @@ function resetReading(){
 // ============================================================
 // PARENT SETTINGS + DASHBOARD
 // ============================================================
-function openParentGate(){pinEntry='';updatePinDots();document.getElementById('pinErrorMsg').textContent='';document.getElementById('pinModal').classList.add('show');}
+function openParentGate(){
+  // If no PIN set yet, go straight to settings
+  if(!parentPin||parentPin===''){
+    openParentSettings();
+    return;
+  }
+  pinEntry='';updatePinDots();document.getElementById('pinErrorMsg').textContent='';document.getElementById('pinModal').classList.add('show');
+}
 function closePinModal(){document.getElementById('pinModal').classList.remove('show');pinEntry='';updatePinDots();}
 function pinPress(digit){
   if(pinEntry.length>=4)return;pinEntry+=digit;updatePinDots();
@@ -1349,6 +1357,9 @@ async function openParentSettings(){
   // Show current username
   const unEl=document.getElementById('currentUsernameText');
   if(unEl)unEl.textContent=myUsername||'not set';
+  // Show warning if no PIN set
+  const noPinBanner=document.getElementById('noPinBanner');
+  if(noPinBanner)noPinBanner.style.display=(!parentPin||parentPin==='')?'block':'none';
   // Pre-populate settings from currentChild
   if(currentChild){
     document.querySelectorAll('#levelOptions .option-btn').forEach(btn=>btn.classList.toggle('selected',btn.textContent.trim().toLowerCase().startsWith(currentChild.reading_level.split(' ')[0])));
@@ -1702,9 +1713,12 @@ async function saveFirstTimeSetup(){
       avatar:setupAvatar,
       reading_level:setupLevel,
       story_length:setupLength,
-      prize:prize||'an ice cream cone!'
+      prize:prize||''
     }]);
     allChildren=await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
+    myUsername=username;
+    const myUsernameEl=document.getElementById('myUsername');
+    if(myUsernameEl)myUsernameEl.textContent=username;
     await selectChild(allChildren[0]);
     btn.innerHTML='Lets Start Reading! 🚀';btn.disabled=false;
   }catch(e){
@@ -1851,17 +1865,22 @@ async function loadFriends(){
       el.innerHTML='<div style="color:#ccc;text-align:center;padding:16px;font-weight:600">No friends yet - search for someone!</div>';
       return;
     }
-    el.innerHTML=friends.map(f=>{
-      const isMeRequester=f.requester_id===familyId;
-      const other=isMeRequester?f.receiver:f.requester;
-      const child=other&&other.children&&other.children[0];
-      const avatar=child?child.avatar:'👤';
-      const name=child?child.name:'Friend';
-      const username=other?other.username:'';
+    // Fetch friend details separately
+    const friendDetails=[];
+    for(const f of friends){
+      const otherId=f.requester_id===familyId?f.receiver_id:f.requester_id;
+      const rows=await supa('GET','families?id=eq.'+otherId+'&select=id,username');
+      const childRows=await supa('GET','children?family_id=eq.'+otherId+'&select=name,avatar&limit=1');
+      friendDetails.push({friendId:f.id,otherId,username:rows&&rows[0]?rows[0].username:'',child:childRows&&childRows[0]?childRows[0]:null});
+    }
+    el.innerHTML=friendDetails.map(f=>{
+      const avatar=f.child?f.child.avatar:'👤';
+      const name=f.child?f.child.name:'Friend';
+      const username=f.username||'';
       return `<div class="friend-item">
         <div class="friend-avatar">${avatar}</div>
         <div class="friend-info"><div class="friend-name">${name}</div><div class="friend-username">@${username}</div></div>
-        <div class="friend-action"><button class="pill-btn pill-remove" onclick="removeFriend('${f.id}')">Remove</button></div>
+        <div class="friend-action"><button class="pill-btn pill-remove" onclick="removeFriend('${f.friendId}')">Remove</button></div>
       </div>`;
     }).join('');
   }catch(e){el.innerHTML='<div style="color:var(--coral);text-align:center;padding:16px">Could not load friends</div>';}
@@ -1890,9 +1909,15 @@ async function checkPendingRequests(){
 async function loadPendingRequests(pending){
   const el=document.getElementById('pendingList');
   if(!pending||pending.length===0){el.innerHTML='';return;}
-  // Get requester info
-  const ids=pending.map(p=>p.requester_id);
-  const requesters=await supa('GET','families?id=in.('+ids.join(',')+')'+'&select=username,children(name,avatar)');
+  // Get requester info - fetch each separately to avoid join issues
+  const requesters=[];
+  for(const p of pending){
+    const rows=await supa('GET','families?id=eq.'+p.requester_id+'&select=id,username');
+    if(rows&&rows.length>0){
+      const childRows=await supa('GET','children?family_id=eq.'+p.requester_id+'&select=name,avatar&limit=1');
+      requesters.push({...rows[0],children:childRows||[]});
+    }
+  }
   el.innerHTML=pending.map(p=>{
     const req=requesters&&requesters.find(r=>r.id===p.requester_id);
     const child=req&&req.children&&req.children[0];
