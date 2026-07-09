@@ -277,7 +277,7 @@
   .friend-avatar{font-size:2rem;flex-shrink:0}
   .friend-info{flex:1}
   .friend-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--ink)}
-  .friend-username{font-size:.78rem;color:#bbb;font-weight:600}
+  .friend-username{font-size:.78rem;color:#bbb;font-weight:600;word-break:break-all}
   .friend-action{flex-shrink:0}
   .pill-btn{font-family:'Fredoka One',cursive;font-size:.85rem;border:none;border-radius:12px;padding:8px 14px;cursor:pointer;transition:all .15s;touch-action:manipulation;min-height:36px}
   .pill-btn:active{transform:scale(.93)}
@@ -1336,11 +1336,19 @@ function openParentGate(){
   }
   pinEntry='';updatePinDots();document.getElementById('pinErrorMsg').textContent='';document.getElementById('pinModal').classList.add('show');
 }
-function closePinModal(){document.getElementById('pinModal').classList.remove('show');pinEntry='';updatePinDots();}
+function closePinModal(){document.getElementById('pinModal').classList.remove('show');pinEntry='';updatePinDots();pendingAcceptId=null;document.getElementById('pinErrorMsg').textContent='';}
 function pinPress(digit){
   if(pinEntry.length>=4)return;pinEntry+=digit;updatePinDots();
   if(pinEntry.length===4){
-    if(pinEntry===parentPin){closePinModal();openParentSettings();}
+    if(pinEntry===parentPin){
+      closePinModal();
+      if(pendingAcceptId){
+        doAcceptFriend(pendingAcceptId);
+        pendingAcceptId=null;
+      } else {
+        openParentSettings();
+      }
+    }
     else{document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));document.getElementById('pinErrorMsg').textContent='Wrong PIN - try again!';setTimeout(()=>{pinEntry='';updatePinDots();document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('error'));document.getElementById('pinErrorMsg').textContent='';},900);}
   }
 }
@@ -1735,6 +1743,7 @@ async function saveFirstTimeSetup(){
 let myUsername='';
 let parentApproveFriends=true;
 let lastSharedStoryId=null;
+let pendingAcceptId=null;
 
 // ============================================================
 // BOTTOM NAV
@@ -1976,7 +1985,22 @@ async function sendFriendRequest(receiverId,btn){
   }
 }
 
-async function acceptFriend(friendId){
+function acceptFriend(friendId){
+  // Require parent PIN to accept friend requests
+  if(parentPin&&parentPin!==''){
+    pendingAcceptId=friendId;
+    pinEntry='';updatePinDots();
+    document.getElementById('pinErrorMsg').textContent='Parent PIN required to accept friend requests';
+    document.getElementById('pinModal').classList.add('show');
+  } else {
+    // No PIN set - accept directly but show warning
+    if(confirm('No parent PIN is set. Accept this friend request?')){
+      doAcceptFriend(friendId);
+    }
+  }
+}
+
+async function doAcceptFriend(friendId){
   try{
     await supa('PATCH','friends?id=eq.'+friendId,{status:'accepted'});
     checkPendingRequests();
