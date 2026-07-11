@@ -275,9 +275,9 @@
   .friend-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #f5f5f5}
   .friend-item:last-child{border-bottom:none}
   .friend-avatar{font-size:2rem;flex-shrink:0}
-  .friend-info{flex:1}
+  .friend-info{flex:1;min-width:0;overflow:hidden}
   .friend-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--ink)}
-  .friend-username{font-size:.78rem;color:#bbb;font-weight:600;word-break:break-all}
+  .friend-username{font-size:.78rem;color:#bbb;font-weight:600;word-break:break-all;white-space:normal}
   .friend-action{flex-shrink:0}
   .pill-btn{font-family:'Fredoka One',cursive;font-size:.85rem;border:none;border-radius:12px;padding:8px 14px;cursor:pointer;transition:all .15s;touch-action:manipulation;min-height:36px}
   .pill-btn:active{transform:scale(.93)}
@@ -1503,6 +1503,10 @@ async function saveChildSettings(){
     currentChild.reading_level=reading_level;currentChild.story_length=story_length;currentChild.prize=prize||'';
     const idx=allChildren.findIndex(c=>c.id===currentChild.id);
     if(idx>=0){allChildren[idx].reading_level=reading_level;allChildren[idx].story_length=story_length;allChildren[idx].prize=prize||'';}
+    // Update prize display immediately if story is loaded
+    const prizeCard=document.getElementById('prizeCard');
+    if(prizeCard)prizeCard.style.display=prize?'block':'none';
+    if(prize){document.getElementById('prizeText').textContent=prize;}
     btn.innerHTML='✅ Saved!';setTimeout(()=>{btn.innerHTML='💾 Save Child Settings';btn.disabled=false;},1500);
   }catch(e){
     alert('Could not save - please try again');
