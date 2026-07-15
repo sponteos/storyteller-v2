@@ -1200,7 +1200,7 @@ async function generateStory(){
 // LOAD STORY
 // ============================================================
 function loadStory(text,title){
-  wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};currentStoryText=text;
+  wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};currentStoryText=text;lastProcessed='';
   if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
   document.getElementById('storyTitle').textContent=title;
   const prize=currentChild&&currentChild.prize?currentChild.prize.trim():'';
@@ -1242,7 +1242,7 @@ function highlightCurrent(){
 // ============================================================
 const SKIP_WORDS=new Set(['a','an','the','and','or','but','in','on','at','to','of','it','is','was','he','she','they','we','i','my','his','her','its','as','up','so','do','be','by','if','no','us','am']);
 function editDistance(a,b){if(a===b)return 0;const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>[i]);for(let j=0;j<=n;j++)dp[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
-function isMatch(s,t){if(!s||!t)return false;if(s===t)return true;if(t.length<=3)return false;return editDistance(s,t)<=1;}
+function isMatch(s,t){if(!s||!t)return false;if(s===t)return true;if(t.length<=3)return s===t;if(t.length<=6)return editDistance(s,t)<=1;return editDistance(s,t)<=2;}
 function skipTinyWords(){while(wordIndex<words.length&&SKIP_WORDS.has(words[wordIndex]))wordIndex++;}
 
 // ============================================================
@@ -1254,22 +1254,28 @@ function startReading(){
   recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
   let consumed=0;
   recognition.onstart=()=>{isListening=true;consumed=0;document.getElementById('micDot').classList.add('active');document.getElementById('micStatus').classList.add('listening');document.getElementById('micLabel').textContent='🎤 Listening... Read the highlighted word!';document.getElementById('startBtn').style.display='none';document.getElementById('pauseBtn').style.display='block';skipTinyWords();highlightCurrent();};
+  let lastProcessed='';
   recognition.onresult=(event)=>{
-    // Only use the latest final result to avoid re-processing old speech
+    // Use latest result - both interim and final for responsiveness
     let newText='';
     for(let i=event.resultIndex;i<event.results.length;i++){
-      if(event.results[i].isFinal) newText+=event.results[i][0].transcript+' ';
+      newText+=event.results[i][0].transcript+' ';
     }
-    if(!newText.trim())return;
-    document.getElementById('heardBox').textContent='🎧 Hearing: "'+newText.trim().slice(-60)+'"';
-    const spoken=newText.trim().toLowerCase().split(/[\s\-—–]+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
-    for(const s of spoken){
+    newText=newText.trim();
+    if(!newText||newText===lastProcessed)return;
+    lastProcessed=newText;
+    document.getElementById('heardBox').textContent='🎧 Hearing: "'+newText.slice(-60)+'"';
+    const spoken=newText.toLowerCase().split(/[\s\-—–]+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
+    // Only look at last 3 spoken words to avoid re-processing
+    const recentSpoken=spoken.slice(-3);
+    for(const s of recentSpoken){
       if(wordIndex>=words.length)break;
       // ASSISTED MODE: any speech counts, advance after 2 attempts
       if(assistedWord===wordIndex&&s.length>0){
         assistedAttempts++;
         if(assistedAttempts>=2){
           assistedWord=-1;assistedAttempts=0;
+          lastProcessed='';
           wordIndex++;skipTinyWords();highlightCurrent();
           if(wordIndex>=words.length){celebrate();return;}
         } else {
@@ -1277,9 +1283,17 @@ function startReading(){
         }
         continue;
       }
-      // NORMAL MODE: only match current word exactly - no lookahead
+      // NORMAL MODE: match current word
       if(isMatch(s,words[wordIndex])){
+        lastProcessed='';
         wordIndex++;skipTinyWords();highlightCurrent();
+        if(wordIndex>=words.length){celebrate();return;}
+        continue;
+      }
+      // 1-word lookahead: if next word matches, advance past current
+      if(wordIndex+1<words.length&&isMatch(s,words[wordIndex+1])){
+        lastProcessed='';
+        wordIndex+=2;skipTinyWords();highlightCurrent();
         if(wordIndex>=words.length){celebrate();return;}
       }
     }
