@@ -744,9 +744,14 @@ function savePin(){
   if(pn.length!==4||!/^\d{4}$/.test(pn)){alert('PIN must be exactly 4 numbers!');return;}
   parentPin=pn;
   try{localStorage.setItem('sr_pin_'+familyId,pn);}catch(e){}
-  const btn=document.querySelector('#screenParent .btn-sky');
-  const orig=btn.textContent;btn.textContent='✅ Saved!';
-  setTimeout(()=>btn.textContent=orig,1500);
+  document.getElementById('pinInput').value='';
+  const noPinBanner=document.getElementById('noPinBanner');
+  if(noPinBanner)noPinBanner.style.display='none';
+  const btns=document.querySelectorAll('#screenParent .btn-sky');
+  const btn=btns[btns.length-1];
+  const orig=btn.innerHTML;
+  btn.innerHTML='✅ PIN Saved!';btn.disabled=true;
+  setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2000);
 }
 
 // ============================================================
@@ -1206,7 +1211,7 @@ function loadStory(text,title){
   const prizeRevealEl=document.getElementById('prizeReveal');
   prizeRevealEl.style.display=prz?'block':'none';
   prizeRevealEl.textContent=prz?'🎁 You earned: '+prz:'';
-  words=text.split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'').toLowerCase()).filter(w=>w.length>0);
+  words=text.split(/[\s\-—–]+/).map(w=>w.replace(/[^a-zA-Z']/g,'').toLowerCase()).filter(w=>w.length>1||['a','i'].includes(w));
   document.getElementById('storyDisplay').innerHTML=text.split(/\s+/).map((w,i)=>`<span class="word" id="word-${i}" onclick="hearWord(${i})">${w} </span>`).join('');
   highlightCurrent();
   document.getElementById('startBtn').style.display='block';
@@ -1257,7 +1262,7 @@ function startReading(){
     }
     if(!newText.trim())return;
     document.getElementById('heardBox').textContent='🎧 Hearing: "'+newText.trim().slice(-60)+'"';
-    const spoken=newText.trim().toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
+    const spoken=newText.trim().toLowerCase().split(/[\s\-—–]+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
     for(const s of spoken){
       if(wordIndex>=words.length)break;
       // ASSISTED MODE: any speech counts, advance after 2 attempts
@@ -1547,7 +1552,7 @@ document.addEventListener('click',unlockSpeech,{once:true});
 function hearWord(idx){
   if(idx<wordIndex)return;
   const el=document.getElementById('word-'+idx);if(!el)return;
-  const raw=el.textContent.trim().replace(/[^a-zA-Z',-]/g,'');if(!raw)return;
+  const raw=el.textContent.trim().replace(/[-—–]/g,' ').replace(/[^a-zA-Z' ]/g,'').trim();if(!raw)return;
   window.speechSynthesis.cancel();
   el.classList.add('speaking');setTimeout(()=>el.classList.remove('speaking'),800);
   setTimeout(()=>{const utt=new SpeechSynthesisUtterance(raw);utt.rate=0.82;utt.pitch=1.1;utt.volume=1;window.speechSynthesis.speak(utt);},50);
