@@ -668,7 +668,7 @@
     <div class="streak-reveal" id="streakReveal">🌟 Story complete!</div>
     <div class="prize-reveal" id="prizeReveal">🍦 You earned: an ice cream cone!</div>
     <p style="font-size:.85rem;color:#bbb;margin-bottom:16px">Show this to a grown-up!</p>
-    <button class="btn btn-sky" id="shareStoryBtn" onclick="shareLastStory()" style="margin-bottom:8px">📢 Share with Friends!</button>
+    <button class="btn btn-sky" id="shareStoryBtn" onclick="shareLastStory()" style="margin-bottom:8px;display:none">📢 Share with Friends!</button>
     <button class="btn btn-purple" onclick="closeAndNewStory()">Tell a New Story 🎙️</button>
   </div>
 </div>
@@ -1069,7 +1069,10 @@ function renderHistory(){
     <div class="history-item">
       <span>📖</span>
       <span class="h-idea">${h.idea}</span>
-      <span class="h-date">${new Date(h.read_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+      <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+        <span class="h-date">${new Date(h.read_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+        ${h.shared?'<span style="font-size:.65rem;font-weight:800;color:var(--grass)">✅ Shared</span>':''}
+      </span>
     </div>`).join('');
 }
 
@@ -1098,7 +1101,7 @@ async function recordStoryFinished(idea){
   childStats.streak=newStreak;
   childStats.total_stories=newTotal;
   childStats.last_read_date=today;
-  childHistory.unshift({idea,read_at:new Date().toISOString()});
+  childHistory.unshift({idea,read_at:new Date().toISOString(),shared:false});
   if(childHistory.length>10)childHistory=childHistory.slice(0,10);
 
   updateStatsUI();
@@ -1540,6 +1543,13 @@ function celebrate(){
   isListening=false;if(recognition){try{recognition.stop();}catch(e){}}
   document.getElementById('pauseBtn').style.display='none';
   document.getElementById('micLabel').textContent='🎉 You did it! Amazing reading!';
+  // Reset share button
+  const shareBtn=document.getElementById('shareStoryBtn');
+  if(shareBtn){
+    shareBtn.style.display=currentIdeaForHistory?'block':'none';
+    shareBtn.innerHTML='📢 Share with Friends!';
+    shareBtn.style.background='';shareBtn.disabled=false;
+  }
   recordStoryFinished(currentIdeaForHistory).then(()=>{
     const name=currentChild?currentChild.name:'';
     document.getElementById('celebName').textContent='Amazing job'+(name?' '+name:'')+'!';
@@ -1623,6 +1633,31 @@ async function saveEditChild(){
   }catch(e){
     alert('Something went wrong, please try again');
     btn.innerHTML='Save Changes ✅';btn.disabled=false;
+  }
+}
+
+// ============================================================
+// READ FRIEND STORY
+// ============================================================
+async function readFriendStory(storyId, idea){
+  try{
+    // Fetch the full story
+    const rows=await supa('GET','stories?id=eq.'+storyId+'&select=story_text,idea');
+    if(!rows||rows.length===0||!rows[0].story_text){
+      alert('Story text not available');return;
+    }
+    const storyText=rows[0].story_text;
+    const title='Story by a friend: '+idea.split(' ').slice(0,5).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+    // Load into reading screen
+    loadStory(storyText,title);
+    showScreen('screenReading');
+    switchNav('read');
+    // Don't record as finished for friend's story
+    currentIdeaForHistory='';
+    lastSharedStoryId=null;
+  }catch(e){
+    console.error(e);
+    alert('Could not load story - please try again');
   }
 }
 
@@ -1795,10 +1830,10 @@ async function shareLastStory(){
   const btn=document.getElementById('shareStoryBtn');
   btn.innerHTML='<span class="spinner"></span>Sharing...';btn.disabled=true;
   try{
-    // Mark story as shared in Supabase
     await supa('PATCH','stories?id=eq.'+lastSharedStoryId,{shared:true});
-    btn.innerHTML='✅ Shared!';
-    setTimeout(()=>{btn.innerHTML='📢 Share with Friends!';btn.disabled=false;},2000);
+    btn.innerHTML='✅ Posted to your friends feed!';
+    btn.style.background='linear-gradient(135deg,var(--grass),#00B896)';
+    // Don't reset - leave as confirmation
   }catch(e){
     btn.innerHTML='📢 Share with Friends!';btn.disabled=false;
     alert('Could not share - please try again');
@@ -1851,13 +1886,14 @@ async function loadFeed(){
       const counts=reactionCounts[s.id]||{};
       const emojis=['🔥','❤️','⭐'];
       const reactions=emojis.map(e=>`<button class="reaction-btn${myReact===e?' reacted':''}" onclick="reactToStory('${s.id}','${e}',this)">${e} ${counts[e]||''}</button>`).join('');
+      const hasStoryText=s.story_text&&s.story_text.length>0;
       return `<div class="feed-item">
         <div class="feed-header">
           <div class="feed-avatar">${avatar}</div>
           <div><div class="feed-name">${name}</div><div class="feed-time">@${username} · ${date}</div></div>
         </div>
         <div class="feed-idea">📖 "${s.idea}"</div>
-        <div class="feed-reactions">${reactions}</div>
+        <div class="feed-reactions">${reactions}${hasStoryText?`<button class="reaction-btn" onclick="readFriendStory('${s.id}','${s.idea.replace(/'/g,'\'').replace(/"/g,'&quot;')}')" style="margin-left:auto;background:linear-gradient(135deg,var(--purple),#7C3AED);color:white;border:none">📖 Read it!</button>`:''}</div>
       </div>`;
     }).join('');
     // Clear badge
