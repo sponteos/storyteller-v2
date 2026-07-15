@@ -1639,24 +1639,30 @@ async function saveEditChild(){
 // ============================================================
 // READ FRIEND STORY
 // ============================================================
-async function readFriendStory(storyId, idea){
+async function readFriendStory(storyId){
   try{
-    // Fetch the full story
-    const rows=await supa('GET','stories?id=eq.'+storyId+'&select=story_text,idea');
-    if(!rows||rows.length===0||!rows[0].story_text){
-      alert('Story text not available');return;
+    // Get from cache or fetch
+    let story=feedStoryCache[storyId];
+    if(!story){
+      const rows=await supa('GET','stories?id=eq.'+storyId+'&select=story_text,idea');
+      if(!rows||rows.length===0||!rows[0].story_text){alert('Story text not available');return;}
+      story=rows[0];
+      feedStoryCache[storyId]=story;
     }
-    const storyText=rows[0].story_text;
-    const title='Story by a friend: '+idea.split(' ').slice(0,5).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+    const title='A friend wrote: '+story.idea.split(' ').slice(0,5).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+    // Track that this story was read - enables reactions
+    feedReadStories.add(storyId);
+    currentFriendStoryId=storyId;
     // Load into reading screen
-    loadStory(storyText,title);
+    loadStory(story.story_text,title);
     showScreen('screenReading');
-    switchNav('read');
-    // Don't record as finished for friend's story
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('navRead').classList.add('active');
+    // Don't record as own story
     currentIdeaForHistory='';
     lastSharedStoryId=null;
   }catch(e){
-    console.error(e);
+    console.error('readFriendStory error:',e);
     alert('Could not load story - please try again');
   }
 }
@@ -1802,6 +1808,9 @@ let myUsername='';
 let parentApproveFriends=true;
 let lastSharedStoryId=null;
 let pendingAcceptId=null;
+let feedStoryCache={};
+let feedReadStories=new Set();
+let currentFriendStoryId=null;
 
 // ============================================================
 // BOTTOM NAV
@@ -1846,6 +1855,7 @@ async function shareLastStory(){
 async function loadFeed(){
   const feedEl=document.getElementById('feedContent');
   feedEl.innerHTML='<div style="text-align:center;color:#ccc;padding:20px">Loading...</div>';
+  feedStoryCache={};
   try{
     // Get accepted friends
     const friends=await supa('GET','friends?or=(requester_id.eq.'+familyId+',receiver_id.eq.'+familyId+')&status=eq.accepted&select=*');
@@ -1887,13 +1897,18 @@ async function loadFeed(){
       const emojis=['🔥','❤️','⭐'];
       const reactions=emojis.map(e=>`<button class="reaction-btn${myReact===e?' reacted':''}" onclick="reactToStory('${s.id}','${e}',this)">${e} ${counts[e]||''}</button>`).join('');
       const hasStoryText=s.story_text&&s.story_text.length>0;
+      if(hasStoryText)feedStoryCache[s.id]=s;
+      const alreadyRead=feedReadStories.has(s.id);
       return `<div class="feed-item">
         <div class="feed-header">
           <div class="feed-avatar">${avatar}</div>
           <div><div class="feed-name">${name}</div><div class="feed-time">@${username} · ${date}</div></div>
         </div>
         <div class="feed-idea">📖 "${s.idea}"</div>
-        <div class="feed-reactions">${reactions}${hasStoryText?`<button class="reaction-btn" onclick="readFriendStory('${s.id}','${s.idea.replace(/'/g,'\'').replace(/"/g,'&quot;')}')" style="margin-left:auto;background:linear-gradient(135deg,var(--purple),#7C3AED);color:white;border:none">📖 Read it!</button>`:''}</div>
+        <div class="feed-reactions">
+          ${alreadyRead?reactions:'<span style="font-size:.82rem;color:#bbb;font-weight:700;font-style:italic">Read the story to react!</span>'}
+          ${hasStoryText?`<button class="reaction-btn" onclick="readFriendStory('${s.id}')" style="margin-left:auto;background:linear-gradient(135deg,var(--purple),#7C3AED);color:white;border:none">${alreadyRead?'📖 Read again':'📖 Read it!'}</button>`:''}
+        </div>
       </div>`;
     }).join('');
     // Clear badge
