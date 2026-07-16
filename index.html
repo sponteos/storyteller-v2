@@ -247,6 +247,22 @@
   @keyframes spin{to{transform:rotate(360deg)}}
 
   @media(min-width:480px){.container{padding:24px 24px 100px}.story-box{font-size:1.2rem}.card{padding:28px}}
+
+  /* ONBOARDING TOUR */
+  .tour-overlay{position:fixed;inset:0;z-index:500;pointer-events:none}
+  .tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;transition:all .3s}
+  .tour-spotlight{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.7);z-index:501;transition:all .4s cubic-bezier(.4,0,.2,1);pointer-events:none}
+  .tour-card{position:fixed;background:white;border-radius:22px;padding:22px 20px;max-width:300px;width:calc(100% - 48px);z-index:502;box-shadow:0 12px 40px rgba(0,0,0,.3);animation:slideUp .3s cubic-bezier(.34,1.4,.64,1)}
+  .tour-card .tour-emoji{font-size:2.2rem;display:block;margin-bottom:8px}
+  .tour-card h3{font-family:'Fredoka One',cursive;font-size:1.25rem;color:var(--ink);margin-bottom:6px}
+  .tour-card p{font-size:.9rem;color:#666;font-weight:600;line-height:1.5;margin-bottom:16px}
+  .tour-btns{display:flex;gap:8px;align-items:center}
+  .tour-next{font-family:'Fredoka One',cursive;font-size:1rem;background:linear-gradient(135deg,var(--purple),#7C3AED);color:white;border:none;border-radius:14px;padding:12px 20px;cursor:pointer;flex:1;touch-action:manipulation}
+  .tour-next:active{transform:scale(.95)}
+  .tour-skip{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:#bbb;background:none;border:none;cursor:pointer;padding:8px;touch-action:manipulation}
+  .tour-dots{display:flex;gap:5px;justify-content:center;margin-bottom:12px}
+  .tour-dot{width:7px;height:7px;border-radius:50%;background:#eee;transition:all .2s}
+  .tour-dot.active{background:var(--purple);width:18px;border-radius:4px}
   @media(max-width:479px){.sky .sun-icon{display:none}}
 
   /* BOTTOM NAV */
@@ -367,7 +383,7 @@
   <div class="header">
     <div class="header-row">
       <h1>Story Reader</h1>
-      <button class="parent-btn" onclick="openParentGate()" title="Parent Settings">⚙️</button>
+      <button class="parent-btn" id="parentGateBtn" onclick="openParentGate()" title="Parent Settings">⚙️</button>
     </div>
     <p id="headerSub">Your story, your adventure!</p>
   </div>
@@ -603,6 +619,20 @@
     <span class="nav-icon">👥</span>Friends
     <span class="nav-badge" id="friendsBadge" style="display:none">!</span>
   </button>
+</div>
+
+<!-- TOUR -->
+<div id="tourBackdrop" class="tour-backdrop" style="display:none" onclick=""></div>
+<div id="tourSpotlight" class="tour-spotlight" style="display:none"></div>
+<div id="tourCard" class="tour-card" style="display:none">
+  <div class="tour-dots" id="tourDots"></div>
+  <span class="tour-emoji" id="tourEmoji">🎙️</span>
+  <h3 id="tourTitle">Welcome!</h3>
+  <p id="tourText">Let us show you around!</p>
+  <div class="tour-btns">
+    <button class="tour-skip" onclick="endTour()">Skip tour</button>
+    <button class="tour-next" id="tourNextBtn" onclick="nextTourStep()">Next →</button>
+  </div>
 </div>
 
 </div><!-- end mainApp -->
@@ -906,8 +936,10 @@ async function enterApp(){
     if(el)el.textContent=myUsername||'not set';
   }
   allChildren=await supa('GET','children?family_id=eq.'+familyId+'&select=*&order=created_at.asc');
-  if(allChildren&&allChildren.length>0){await selectChild(allChildren[0]);}
-  else{showFirstTimeSetup();}
+  if(allChildren&&allChildren.length>0){
+    await selectChild(allChildren[0]);
+    setTimeout(startTour,800);
+  } else {showFirstTimeSetup();}
   // Check for pending friend requests
   checkPendingRequests();
 }
@@ -1823,6 +1855,8 @@ async function saveFirstTimeSetup(){
     if(myUsernameEl)myUsernameEl.textContent=username;
     await selectChild(allChildren[0]);
     btn.innerHTML='Lets Start Reading! 🚀';btn.disabled=false;
+    // Start tour for new users
+    setTimeout(startTour, 600);
   }catch(e){
     console.error(e);
     if(e.message&&e.message.includes('unique'))alert('That username is taken - try another one!');
@@ -2134,6 +2168,144 @@ function copyUsername(){
     const orig=btn.innerHTML;btn.innerHTML='Copied! ✅';
     setTimeout(()=>btn.innerHTML=orig,2000);
   }).catch(()=>alert('Your username: '+myUsername));
+}
+
+// ============================================================
+// ONBOARDING TOUR
+// ============================================================
+const TOUR_STEPS=[
+  {
+    emoji:'👋',
+    title:'Welcome to Story Reader!',
+    text:'Let us show you around — it only takes a minute! You can skip anytime.',
+    target:null, // center screen
+    position:'center'
+  },
+  {
+    emoji:'🎙️',
+    title:'Tell your story idea!',
+    text:'Tap the big mic button and speak your story idea out loud — or type it in. The AI will write a custom story just for you!',
+    target:'ideaMicBtn',
+    position:'above'
+  },
+  {
+    emoji:'📖',
+    title:'Read out loud!',
+    text:'After your story is created, press "Start Reading Out Loud" and read each highlighted word. The app follows along as you read!',
+    target:'startBtn',
+    position:'above'
+  },
+  {
+    emoji:'⚙️',
+    title:'Parent Settings',
+    text:'Parents — tap the gear icon to set reading level, story length, a prize for finishing, and a PIN to keep settings locked.',
+    target:'parentGateBtn',
+    position:'below'
+  },
+  {
+    emoji:'👥',
+    title:'Read with Friends!',
+    text:'Add friends by username, share stories you have read, and see what your friends are reading in the Feed tab!',
+    target:'navFriends',
+    position:'above'
+  },
+  {
+    emoji:'🎉',
+    title:'You are all set!',
+    text:'Happy reading! Remember: finish a story to build your streak and earn badges. Go create your first story!',
+    target:null,
+    position:'center'
+  }
+];
+
+let tourStep=0;
+
+function startTour(){
+  try{if(localStorage.getItem('sr_tour_done_v1'))return;}catch(e){}
+  tourStep=0;
+  showTourStep();
+}
+
+function showTourStep(){
+  const step=TOUR_STEPS[tourStep];
+  const backdrop=document.getElementById('tourBackdrop');
+  const spotlight=document.getElementById('tourSpotlight');
+  const card=document.getElementById('tourCard');
+
+  backdrop.style.display='block';
+  card.style.display='block';
+
+  // Update content
+  document.getElementById('tourEmoji').textContent=step.emoji;
+  document.getElementById('tourTitle').textContent=step.title;
+  document.getElementById('tourText').textContent=step.text;
+  document.getElementById('tourNextBtn').textContent=tourStep===TOUR_STEPS.length-1?'Get started! 🚀':'Next →';
+
+  // Dots
+  document.getElementById('tourDots').innerHTML=TOUR_STEPS.map((_,i)=>`<div class="tour-dot${i===tourStep?' active':''}"></div>`).join('');
+
+  // Position spotlight and card
+  if(step.target){
+    const el=document.getElementById(step.target);
+    if(el){
+      const rect=el.getBoundingClientRect();
+      const pad=12;
+      spotlight.style.display='block';
+      spotlight.style.left=(rect.left-pad)+'px';
+      spotlight.style.top=(rect.top-pad)+'px';
+      spotlight.style.width=(rect.width+pad*2)+'px';
+      spotlight.style.height=(rect.height+pad*2)+'px';
+
+      // Position card above or below
+      const cardW=Math.min(300,window.innerWidth-48);
+      let cardLeft=Math.max(24,rect.left+(rect.width/2)-(cardW/2));
+      if(cardLeft+cardW>window.innerWidth-24)cardLeft=window.innerWidth-cardW-24;
+      card.style.width=cardW+'px';
+      card.style.left=cardLeft+'px';
+
+      if(step.position==='above'){
+        card.style.top=(rect.top-pad-10)+'px';
+        card.style.transform='translateY(-100%)';
+        card.style.bottom='auto';
+      } else {
+        card.style.top=(rect.bottom+pad+10)+'px';
+        card.style.transform='none';
+        card.style.bottom='auto';
+      }
+    }
+  } else {
+    // Center on screen
+    spotlight.style.display='none';
+    card.style.left='50%';
+    card.style.top='50%';
+    card.style.transform='translate(-50%,-50%)';
+    card.style.bottom='auto';
+    card.style.width=Math.min(300,window.innerWidth-48)+'px';
+  }
+}
+
+function nextTourStep(){
+  tourStep++;
+  if(tourStep>=TOUR_STEPS.length){endTour();return;}
+  // For nav steps, switch to that tab first
+  const step=TOUR_STEPS[tourStep];
+  if(step.target==='navFriends'){
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('navFriends').classList.add('active');
+  }
+  showTourStep();
+}
+
+function endTour(){
+  document.getElementById('tourBackdrop').style.display='none';
+  document.getElementById('tourSpotlight').style.display='none';
+  document.getElementById('tourCard').style.display='none';
+  // Switch back to read tab if we moved away
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('navRead').classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screenIdea').classList.add('active');
+  try{localStorage.setItem('sr_tour_done_v1','1');}catch(e){}
 }
 
 // ============================================================
