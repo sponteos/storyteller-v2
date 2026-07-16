@@ -991,7 +991,7 @@ async function selectChild(child){
   }
 
   // Load history
-  const hist=await supa('GET','stories?child_id=eq.'+child.id+'&select=*&order=read_at.desc&limit=10');
+  const hist=await supa('GET','stories?child_id=eq.'+child.id+'&select=id,idea,read_at,shared,story_text&order=read_at.desc&limit=10');
   childHistory=hist||[];
 
   updateStatsUI();
@@ -1065,14 +1065,17 @@ function renderBadges(){
 function renderHistory(){
   const list=document.getElementById('historyList');
   if(!childHistory.length){list.innerHTML='<div class="history-empty">No stories yet - read one to get started!</div>';return;}
+  // Cache story texts for read again
+  childHistory.forEach(h=>{if(h.id&&h.story_text)historyStoryCache[h.id]=h;});
   list.innerHTML=childHistory.map(h=>`
-    <div class="history-item">
+    <div class="history-item" style="flex-wrap:wrap;gap:8px">
       <span>📖</span>
-      <span class="h-idea">${h.idea}</span>
+      <span class="h-idea" style="flex:1;min-width:0">${h.idea}</span>
       <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
         <span class="h-date">${new Date(h.read_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
         ${h.shared?'<span style="font-size:.65rem;font-weight:800;color:var(--grass)">✅ Shared</span>':''}
       </span>
+      ${h.id&&h.story_text?`<button class="pill-btn pill-accept" style="width:100%;margin-top:4px;font-size:.82rem;padding:8px" onclick="readAgain('${h.id}')">📖 Read Again</button>`:''}
     </div>`).join('');
 }
 
@@ -1101,7 +1104,7 @@ async function recordStoryFinished(idea){
   childStats.streak=newStreak;
   childStats.total_stories=newTotal;
   childStats.last_read_date=today;
-  childHistory.unshift({idea,read_at:new Date().toISOString(),shared:false});
+  childHistory.unshift({id:newStory&&newStory[0]?newStory[0].id:null,idea,read_at:new Date().toISOString(),shared:false,story_text:currentStoryText});
   if(childHistory.length>10)childHistory=childHistory.slice(0,10);
 
   updateStatsUI();
@@ -1668,6 +1671,33 @@ async function readFriendStory(storyId){
 }
 
 // ============================================================
+// READ AGAIN FROM HISTORY
+// ============================================================
+async function readAgain(storyId){
+  try{
+    let story=historyStoryCache[storyId];
+    if(!story||!story.story_text){
+      // Fetch from Supabase if not in cache
+      const rows=await supa('GET','stories?id=eq.'+storyId+'&select=story_text,idea');
+      if(!rows||rows.length===0||!rows[0].story_text){alert('Story text not available');return;}
+      story=rows[0];
+      historyStoryCache[storyId]=story;
+    }
+    const title='The Story of '+story.idea.split(' ').slice(0,5).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+    // Set up as own story so it counts toward streak if finished again
+    currentIdeaForHistory=story.idea;
+    lastSharedStoryId=storyId;
+    loadStory(story.story_text,title);
+    showScreen('screenReading');
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('navRead').classList.add('active');
+  }catch(e){
+    console.error('readAgain error:',e);
+    alert('Could not load story - please try again');
+  }
+}
+
+// ============================================================
 // SETTINGS NAVIGATION
 // ============================================================
 function returnFromSettings(){
@@ -1811,6 +1841,7 @@ let pendingAcceptId=null;
 let feedStoryCache={};
 let feedReadStories=new Set();
 let currentFriendStoryId=null;
+let historyStoryCache={};
 
 // ============================================================
 // BOTTOM NAV
