@@ -622,7 +622,7 @@
 </div>
 
 <!-- TOUR -->
-<div id="tourBackdrop" class="tour-backdrop" style="display:none" onclick=""></div>
+<div id="tourBackdrop" class="tour-backdrop" style="display:none"></div>
 <div id="tourSpotlight" class="tour-spotlight" style="display:none"></div>
 <div id="tourCard" class="tour-card" style="display:none">
   <div class="tour-dots" id="tourDots"></div>
@@ -2233,6 +2233,7 @@ function showTourStep(){
   const card=document.getElementById('tourCard');
 
   backdrop.style.display='block';
+  spotlight.style.display='none'; // always hide spotlight - use centered cards only
   card.style.display='block';
 
   // Update content
@@ -2244,44 +2245,13 @@ function showTourStep(){
   // Dots
   document.getElementById('tourDots').innerHTML=TOUR_STEPS.map((_,i)=>`<div class="tour-dot${i===tourStep?' active':''}"></div>`).join('');
 
-  // Position spotlight and card
-  if(step.target){
-    const el=document.getElementById(step.target);
-    if(el){
-      const rect=el.getBoundingClientRect();
-      const pad=12;
-      spotlight.style.display='block';
-      spotlight.style.left=(rect.left-pad)+'px';
-      spotlight.style.top=(rect.top-pad)+'px';
-      spotlight.style.width=(rect.width+pad*2)+'px';
-      spotlight.style.height=(rect.height+pad*2)+'px';
-
-      // Position card above or below
-      const cardW=Math.min(300,window.innerWidth-48);
-      let cardLeft=Math.max(24,rect.left+(rect.width/2)-(cardW/2));
-      if(cardLeft+cardW>window.innerWidth-24)cardLeft=window.innerWidth-cardW-24;
-      card.style.width=cardW+'px';
-      card.style.left=cardLeft+'px';
-
-      if(step.position==='above'){
-        card.style.top=(rect.top-pad-10)+'px';
-        card.style.transform='translateY(-100%)';
-        card.style.bottom='auto';
-      } else {
-        card.style.top=(rect.bottom+pad+10)+'px';
-        card.style.transform='none';
-        card.style.bottom='auto';
-      }
-    }
-  } else {
-    // Center on screen
-    spotlight.style.display='none';
-    card.style.left='50%';
-    card.style.top='50%';
-    card.style.transform='translate(-50%,-50%)';
-    card.style.bottom='auto';
-    card.style.width=Math.min(300,window.innerWidth-48)+'px';
-  }
+  // Always center the card
+  const cardW=Math.min(320,window.innerWidth-48);
+  card.style.width=cardW+'px';
+  card.style.left='50%';
+  card.style.top='50%';
+  card.style.transform='translate(-50%,-50%)';
+  card.style.bottom='auto';
 }
 
 function nextTourStep(){
