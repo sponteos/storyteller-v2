@@ -1279,7 +1279,17 @@ function highlightCurrent(){
 // ============================================================
 const SKIP_WORDS=new Set(['a','an','the','and','or','but','in','on','at','to','of','it','is','was','he','she','they','we','i','my','his','her','its','as','up','so','do','be','by','if','no','us','am']);
 function editDistance(a,b){if(a===b)return 0;const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>[i]);for(let j=0;j<=n;j++)dp[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
-function isMatch(s,t){if(!s||!t)return false;if(s===t)return true;if(t.length<=3)return s===t;if(t.length<=6)return editDistance(s,t)<=1;return editDistance(s,t)<=2;}
+function isMatch(s,t){
+  if(!s||!t)return false;
+  if(s===t)return true;
+  // Check if spoken word starts with or contains the target (helps with long words)
+  if(t.length>=8&&s.startsWith(t.slice(0,5)))return true;
+  if(t.length>=8&&t.startsWith(s.slice(0,5))&&s.length>=5)return true;
+  if(t.length<=3)return s===t;
+  if(t.length<=6)return editDistance(s,t)<=1;
+  if(t.length<=9)return editDistance(s,t)<=2;
+  return editDistance(s,t)<=3;
+}
 function skipTinyWords(){while(wordIndex<words.length&&SKIP_WORDS.has(words[wordIndex]))wordIndex++;}
 
 // ============================================================
@@ -1757,8 +1767,10 @@ async function saveUsername(){
     await supa('PATCH','families?id=eq.'+familyId,{username});
     myUsername=username;
     document.getElementById('currentUsernameText').textContent=username;
-    const myUsernameEl=document.getElementById('myUsername');
-    if(myUsernameEl)myUsernameEl.textContent=username;
+    // Update username everywhere it appears
+    document.querySelectorAll('#myUsername').forEach(el=>el.textContent=username);
+    const currentUsernameDisplay=document.getElementById('currentUsernameDisplay');
+    if(currentUsernameDisplay)currentUsernameDisplay.querySelector('span span').textContent=username;
     document.getElementById('settingsUsername').value='';
     btn.innerHTML='Saved! ✅';
     setTimeout(()=>{btn.innerHTML='Save Username';btn.disabled=false;},1500);
