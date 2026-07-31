@@ -525,7 +525,7 @@
       <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()" style="display:none;margin-top:10px">⏸️ Pause Reading</button>
       <div class="heard-box" id="heardBox" style="margin-top:10px">Your words will appear here as you read...</div>
       <div style="margin-top:16px">
-        <p style="font-size:.78rem;color:#bbb;font-weight:700;margin-bottom:8px;text-align:center">💡 Tap any word to hear it spoken aloud</p>
+        <p style="font-size:.78rem;color:#bbb;font-weight:700;margin-bottom:8px;text-align:center">💡 Tap a word to hear it · Tap twice to skip it</p>
         <div class="story-box" id="storyDisplay"></div>
         <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
         <div class="progress-label" id="progressLabel">0% read</div>
@@ -1273,7 +1273,7 @@ async function generateStory(){
 // LOAD STORY
 // ============================================================
 function loadStory(text,title){
-  wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};currentStoryText=text;lastProcessed='';
+  wordIndex=0;isPaused=false;isListening=false;assistedWord=-1;assistedAttempts=0;wordAttempts={};currentStoryText=text;lastTappedWord=-1;lastTapTime=0;
   if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
   document.getElementById('storyTitle').textContent=title;
   const prize=currentChild&&currentChild.prize?currentChild.prize.trim():'';
@@ -1337,48 +1337,47 @@ function startReading(){
   if(!SR){document.getElementById('micLabel').textContent='Speech recognition not supported - try Chrome or Safari';return;}
   recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
   let consumed=0;
+  processedResults=new Set();
   recognition.onstart=()=>{isListening=true;consumed=0;document.getElementById('micDot').classList.add('active');document.getElementById('micStatus').classList.add('listening');document.getElementById('micLabel').textContent='🎤 Listening... Read the highlighted word!';document.getElementById('startBtn').style.display='none';document.getElementById('pauseBtn').style.display='block';skipTinyWords();highlightCurrent();};
-  let lastProcessed='';
+  let processedResults=new Set();
   recognition.onresult=(event)=>{
-    // Use latest result - both interim and final for responsiveness
-    let newText='';
+    // Only process NEW final results - prevents re-processing and jumping
     for(let i=event.resultIndex;i<event.results.length;i++){
-      newText+=event.results[i][0].transcript+' ';
-    }
-    newText=newText.trim();
-    if(!newText||newText===lastProcessed)return;
-    lastProcessed=newText;
-    document.getElementById('heardBox').textContent='🎧 Hearing: "'+newText.slice(-60)+'"';
-    const spoken=newText.toLowerCase().split(/[\s\-—–]+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
-    // Only look at last 3 spoken words to avoid re-processing
-    const recentSpoken=spoken.slice(-3);
-    for(const s of recentSpoken){
-      if(wordIndex>=words.length)break;
-      // ASSISTED MODE: any speech counts, advance after 2 attempts
-      if(assistedWord===wordIndex&&s.length>0){
-        assistedAttempts++;
-        if(assistedAttempts>=2){
-          assistedWord=-1;assistedAttempts=0;
-          lastProcessed='';
+      if(!event.results[i].isFinal)continue;
+      const resultKey=i+':'+event.results[i][0].transcript;
+      if(processedResults.has(resultKey))continue;
+      processedResults.add(resultKey);
+      
+      const transcript=event.results[i][0].transcript.trim();
+      const confidence=event.results[i][0].confidence||1;
+      document.getElementById('heardBox').textContent='🎧 Heard: "'+transcript+'"';
+      
+      // Split into individual words
+      const spoken=transcript.toLowerCase().split(/[\s\-—–]+/).map(w=>w.replace(/[^a-zA-Z']/g,'')).filter(w=>w.length>0);
+      
+      for(const s of spoken){
+        if(wordIndex>=words.length)break;
+        
+        // ASSISTED MODE: any speech counts
+        if(assistedWord===wordIndex&&s.length>0){
+          assistedAttempts++;
+          if(assistedAttempts>=2){
+            assistedWord=-1;assistedAttempts=0;
+            wordIndex++;skipTinyWords();highlightCurrent();
+            if(wordIndex>=words.length){celebrate();return;}
+          } else {
+            document.getElementById('heardBox').textContent='👆 One more time - or tap the word again to skip!';
+          }
+          continue;
+        }
+        
+        // NORMAL MODE: match current word only
+        if(isMatch(s,words[wordIndex])){
+          lastTappedWord=-1; // reset tap state on successful read
           wordIndex++;skipTinyWords();highlightCurrent();
           if(wordIndex>=words.length){celebrate();return;}
-        } else {
-          document.getElementById('heardBox').textContent='👆 One more time - say anything to continue!';
         }
-        continue;
-      }
-      // NORMAL MODE: match current word
-      if(isMatch(s,words[wordIndex])){
-        lastProcessed='';
-        wordIndex++;skipTinyWords();highlightCurrent();
-        if(wordIndex>=words.length){celebrate();return;}
-        continue;
-      }
-      // 1-word lookahead: if next word matches, advance past current
-      if(wordIndex+1<words.length&&isMatch(s,words[wordIndex+1])){
-        lastProcessed='';
-        wordIndex+=2;skipTinyWords();highlightCurrent();
-        if(wordIndex>=words.length){celebrate();return;}
+        // No lookahead - must read current word
       }
     }
   };
@@ -1399,6 +1398,7 @@ function startReading(){
 function togglePause(){
   if(isPaused){
     isPaused=false;isListening=true;
+    processedResults=new Set();
     document.getElementById('pauseBtn').textContent='⏸️ Pause Reading';
     document.getElementById('pauseBtn').classList.remove('btn-primary');
     document.getElementById('pauseBtn').classList.add('btn-secondary');
@@ -1654,18 +1654,36 @@ let speechUnlocked=false;
 function unlockSpeech(){if(speechUnlocked)return;const utt=new SpeechSynthesisUtterance('');window.speechSynthesis.speak(utt);speechUnlocked=true;}
 document.addEventListener('click',unlockSpeech,{once:true});
 
+let lastTappedWord=-1;
+let lastTapTime=0;
+
 function hearWord(idx){
   if(idx<wordIndex)return;
   const el=document.getElementById('word-'+idx);if(!el)return;
   const raw=el.textContent.trim().replace(/[-—–]/g,' ').replace(/[^a-zA-Z' ]/g,'').trim();if(!raw)return;
+  const now=Date.now();
+  
+  // Double tap on current word = advance past it
+  if(idx===wordIndex&&lastTappedWord===idx&&(now-lastTapTime)<2000){
+    // Second tap - advance
+    lastTappedWord=-1;lastTapTime=0;
+    assistedWord=-1;assistedAttempts=0;
+    wordIndex++;skipTinyWords();highlightCurrent();
+    document.getElementById('heardBox').textContent='👆 Good try! Moving on...';
+    if(wordIndex>=words.length){celebrate();return;}
+    return;
+  }
+  
+  // First tap - speak the word and enable assisted mode
+  lastTappedWord=idx;lastTapTime=now;
   window.speechSynthesis.cancel();
   el.classList.add('speaking');setTimeout(()=>el.classList.remove('speaking'),800);
   setTimeout(()=>{const utt=new SpeechSynthesisUtterance(raw);utt.rate=0.82;utt.pitch=1.1;utt.volume=1;window.speechSynthesis.speak(utt);},50);
-  // Enable assisted mode for this word
+  
   if(idx===wordIndex){
     assistedWord=idx;
     assistedAttempts=0;
-    document.getElementById('heardBox').textContent='👆 Assisted mode - say anything twice to continue!';
+    document.getElementById('heardBox').textContent='👆 Tap again to skip, or say the word to continue!';
   }
 }
 
