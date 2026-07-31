@@ -265,6 +265,18 @@
   .tour-dot.active{background:var(--purple);width:18px;border-radius:4px}
   @media(max-width:479px){.sky .sun-icon{display:none}}
 
+  /* WRONG BROWSER SCREEN */
+  .wrong-browser{position:fixed;inset:0;background:linear-gradient(160deg,#B8E4FF 0%,#E8F6FF 40%,#FFFBF0 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
+  .wrong-browser-card{background:white;border-radius:28px;padding:36px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.12)}
+  .wrong-browser-card .wb-emoji{font-size:3.5rem;display:block;margin-bottom:12px}
+  .wrong-browser-card h2{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--ink);margin-bottom:8px}
+  .wrong-browser-card p{font-size:.95rem;color:#666;font-weight:600;margin-bottom:20px;line-height:1.5}
+  .wb-steps{text-align:left;background:#F8F8FF;border-radius:16px;padding:16px 18px;margin-bottom:20px}
+  .wb-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:.9rem;font-weight:700;color:var(--ink);line-height:1.4}
+  .wb-step:last-child{margin-bottom:0}
+  .wb-step .step-num{background:var(--purple);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;font-family:'Fredoka One',cursive}
+  .wb-note{font-size:.8rem;color:#bbb;font-weight:600}
+
   /* BOTTOM NAV */
   .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #eee;display:flex;z-index:50;padding-bottom:var(--safe-bottom);box-shadow:0 -4px 20px rgba(0,0,0,.08)}
   .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;border:none;background:none;color:#bbb;font-family:'Nunito',sans-serif;font-weight:800;font-size:.68rem;gap:3px;transition:all .2s;touch-action:manipulation}
@@ -306,6 +318,30 @@
 </style>
 </head>
 <body>
+
+<!-- WRONG BROWSER SCREEN (iPhone non-Safari) -->
+<div id="wrongBrowserScreen" class="wrong-browser" style="display:none">
+  <div class="wrong-browser-card">
+    <span class="wb-emoji">🧭</span>
+    <h2>Open in Safari!</h2>
+    <p>Story Reader needs Safari to use the microphone for reading. You are currently using a different browser.</p>
+    <div class="wb-steps">
+      <div class="wb-step">
+        <div class="step-num">1</div>
+        <div>Tap the <strong>Share button</strong> at the bottom of your screen (the box with an arrow pointing up) 📤</div>
+      </div>
+      <div class="wb-step">
+        <div class="step-num">2</div>
+        <div>Scroll down and tap <strong>"Open in Safari"</strong> 🧭</div>
+      </div>
+      <div class="wb-step">
+        <div class="step-num">3</div>
+        <div>When Safari asks for <strong>microphone access</strong>, tap <strong>Allow</strong> 🎤</div>
+      </div>
+    </div>
+    <p class="wb-note">Already in Safari? Go to iPhone Settings → Safari → Microphone → Allow, then reload the page.</p>
+  </div>
+</div>
 
 <div class="sky">
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
@@ -2291,6 +2327,34 @@ function endTour(){
 }
 
 // ============================================================
+// BROWSER DETECTION
+// ============================================================
+function checkBrowser(){
+  const ua=navigator.userAgent;
+  const isIphone=/iPhone|iPod/.test(ua);
+  const isIpad=/iPad/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const isIOS=isIphone||isIpad;
+
+  if(!isIOS)return; // Only check on iPhone/iPad
+
+  // Detect non-Safari browsers on iOS
+  // Safari on iOS has 'Safari' in UA but NOT 'CriOS', 'FxiOS', 'OPiOS' etc
+  // Also detect in-app browsers (Instagram, Facebook, Gmail etc) which lack 'Safari'
+  const isSafari=/^((?!CriOS|FxiOS|OPiOS|mercury|EdgiOS|GSA|FBAV|Instagram|Line|Twitter|Snapchat).)*Safari/.test(ua);
+  const isInAppBrowser=!isSafari&&isIOS;
+
+  if(isInAppBrowser){
+    document.getElementById('wrongBrowserScreen').style.display='flex';
+    // Hide everything else
+    document.querySelector('.sky').style.display='none';
+    document.querySelector('.stars').style.display='none';
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('mainApp').style.display='none';
+    document.getElementById('resetScreen').style.display='none';
+  }
+}
+
+// ============================================================
 // INIT
 // ============================================================
 function initStars(){const c=document.getElementById('starsContainer');for(let i=0;i<18;i++){const s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${.6+Math.random()*.7}rem`;c.appendChild(s);}}
@@ -2307,6 +2371,7 @@ async function warmUpMic(){
 // Hide sky until logged in
 document.querySelector('.sky').style.display='none';
 document.querySelector('.stars').style.display='none';
+checkBrowser();
 initStars();
 checkLogin();
 </script>
