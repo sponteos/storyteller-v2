@@ -693,6 +693,19 @@
   </div>
 </div>
 
+<!-- MATH PARENT GATE MODAL (shown when no PIN has been set yet) -->
+<div class="modal" id="mathGateModal">
+  <div class="modal-card">
+    <h3>🧑‍🎓 Grown-ups Only!</h3>
+    <p>Answer this to prove you're a parent:</p>
+    <p id="mathGateQuestion" style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--ink);margin:-8px 0 16px"></p>
+    <input class="setting-input" type="number" inputmode="numeric" id="mathGateInput" placeholder="Your answer" style="text-align:center;margin-bottom:8px" onkeydown="if(event.key==='Enter')submitMathGate()" />
+    <div class="pin-error-msg" id="mathGateErrorMsg"></div>
+    <button class="btn btn-sky" onclick="submitMathGate()" style="margin-bottom:10px">Continue</button>
+    <button class="btn btn-ghost" onclick="closeMathGate()" style="font-size:1rem;padding:14px">Cancel</button>
+  </div>
+</div>
+
 <!-- ADD CHILD MODAL -->
 <div class="modal" id="addChildModal">
   <div class="add-child-modal-card">
@@ -1432,14 +1445,39 @@ function resetReading(){
 // PARENT SETTINGS + DASHBOARD
 // ============================================================
 function openParentGate(){
-  // If no PIN set yet, go straight to settings
+  // If no PIN set yet, still require a simple parent gate before granting access
   if(!parentPin||parentPin===''){
-    openParentSettings();
+    openMathGate(openParentSettings);
     return;
   }
   pinEntry='';updatePinDots();document.getElementById('pinErrorMsg').textContent='';document.getElementById('pinModal').classList.add('show');
 }
 function closePinModal(){document.getElementById('pinModal').classList.remove('show');pinEntry='';updatePinDots();pendingAcceptId=null;document.getElementById('pinErrorMsg').textContent='';}
+
+// Lightweight parent gate (math challenge) used whenever no PIN has been configured yet.
+let mathGateAnswer=null,mathGateCallback=null;
+function openMathGate(callback){
+  const a=Math.floor(Math.random()*8)+2,b=Math.floor(Math.random()*8)+2;
+  mathGateAnswer=a*b;mathGateCallback=callback;
+  document.getElementById('mathGateQuestion').textContent=`What is ${a} × ${b}?`;
+  document.getElementById('mathGateInput').value='';
+  document.getElementById('mathGateErrorMsg').textContent='';
+  document.getElementById('mathGateModal').classList.add('show');
+  setTimeout(()=>{const el=document.getElementById('mathGateInput');if(el)el.focus();},100);
+}
+function closeMathGate(){document.getElementById('mathGateModal').classList.remove('show');mathGateAnswer=null;mathGateCallback=null;}
+function submitMathGate(){
+  const input=document.getElementById('mathGateInput');
+  const val=parseInt(input.value,10);
+  if(!isNaN(val)&&val===mathGateAnswer){
+    const cb=mathGateCallback;
+    closeMathGate();
+    if(cb)cb();
+  }else{
+    document.getElementById('mathGateErrorMsg').textContent='Not quite — try again!';
+    input.value='';input.focus();
+  }
+}
 function pinPress(digit){
   if(pinEntry.length>=4)return;pinEntry+=digit;updatePinDots();
   if(pinEntry.length===4){
@@ -2198,10 +2236,8 @@ function acceptFriend(friendId){
     document.getElementById('pinErrorMsg').textContent='Parent PIN required to accept friend requests';
     document.getElementById('pinModal').classList.add('show');
   } else {
-    // No PIN set - accept directly but show warning
-    if(confirm('No parent PIN is set. Accept this friend request?')){
-      doAcceptFriend(friendId);
-    }
+    // No PIN set yet - still require the parent gate before accepting
+    openMathGate(()=>doAcceptFriend(friendId));
   }
 }
 
