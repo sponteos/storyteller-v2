@@ -612,6 +612,11 @@
       <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN.</p>
       <button class="btn btn-sky" onclick="savePin()" style="margin-top:12px">Save PIN</button>
     </div>
+    <div class="card" style="border:2px solid #FFD9D9">
+      <div class="card-title"><div class="icon icon-coral">⚠️</div>Danger Zone</div>
+      <p style="font-size:.85rem;color:#999;font-weight:600;margin-bottom:12px">Permanently deletes your account, every child profile, all saved stories, reading history, and friend connections. This cannot be undone.</p>
+      <button class="btn btn-ghost" id="deleteAccountBtn" onclick="deleteAccount()" style="color:var(--coral);border:2px solid var(--coral);background:white">🗑️ Delete My Account</button>
+    </div>
     <button class="btn btn-ghost" onclick="returnFromSettings()">← Back to App</button>
     <button class="btn btn-ghost" onclick="logOut()" style="margin-top:8px;color:var(--coral)">🚪 Log Out</button>
   </div>
@@ -1917,6 +1922,34 @@ async function logOut(){
   try{localStorage.removeItem('sr_family_code');}catch(e){}
   familyId=null;currentChild=null;childStats=null;childHistory=[];allChildren=[];
   showLoginScreen();
+}
+
+async function deleteAccount(){
+  if(!confirm('This will PERMANENTLY delete your account, every child profile, all saved stories, reading history, and friend connections. This cannot be undone.\n\nAre you sure you want to continue?'))return;
+  if(!confirm('Last check: this is permanent and cannot be reversed. Delete your account now?'))return;
+  const btn=document.getElementById('deleteAccountBtn');
+  const orig=btn.innerHTML;
+  btn.innerHTML='<span class="spinner"></span>Deleting...';btn.disabled=true;
+  try{
+    const {data:{session}}=await supaAuth.auth.getSession();
+    if(!session){alert('You need to be logged in to delete your account.');btn.innerHTML=orig;btn.disabled=false;return;}
+    const res=await fetch(SUPA_URL+'/functions/v1/delete-account',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'}
+    });
+    let result={};
+    try{result=await res.json();}catch(e){}
+    if(!res.ok||result.error)throw new Error(result.error||('Server error ('+res.status+')'));
+    try{localStorage.removeItem('sr_family_code');}catch(e){}
+    try{if(familyId)localStorage.removeItem('sr_pin_'+familyId);}catch(e){}
+    familyId=null;currentChild=null;childStats=null;childHistory=[];allChildren=[];
+    alert('Your account and all associated data have been permanently deleted.');
+    try{await supaAuth.auth.signOut();}catch(e){}
+    location.reload();
+  }catch(e){
+    alert('Could not delete your account: '+e.message+'. Please try again, or contact support if this keeps happening.');
+    btn.innerHTML=orig;btn.disabled=false;
+  }
 }
 
 // ============================================================
