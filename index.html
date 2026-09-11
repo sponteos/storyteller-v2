@@ -83,7 +83,7 @@
   .auth-panel{animation:fadeUp .25s ease}
   .google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border:2px solid #e0e0e0;border-radius:14px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:var(--ink);transition:all .15s;margin-bottom:4px;touch-action:manipulation}
   .google-btn:active{background:#f5f5f5;transform:scale(.98)}
-  .apple-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border:2px solid #000;border-radius:14px;background:#000;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:#fff;transition:all .15s;margin-bottom:10px;touch-action:manipulation}
+  .apple-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border:none;border-radius:14px;background:#000;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:white;transition:all .15s;margin-bottom:4px;margin-top:10px;touch-action:manipulation}
   .apple-btn:active{background:#222;transform:scale(.98)}
   .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:#ccc;font-size:.82rem;font-weight:700}
   .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:#eee}
@@ -248,6 +248,16 @@
   .spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
   @keyframes spin{to{transform:rotate(360deg)}}
 
+  /* UPGRADE / PREMIUM */
+  .upgrade-card{background:linear-gradient(135deg,#A78BFA,#7C3AED);border-radius:20px;padding:22px 20px;color:white;margin-bottom:16px;text-align:center}
+  .upgrade-card h3{font-family:'Fredoka One',cursive;font-size:1.3rem;margin-bottom:6px}
+  .upgrade-card p{font-size:.9rem;opacity:.9;margin-bottom:14px;font-weight:600}
+  .upgrade-price{font-family:'Fredoka One',cursive;font-size:2rem;margin-bottom:4px}
+  .upgrade-price span{font-size:1rem;opacity:.85;font-family:'Nunito',sans-serif;font-weight:700}
+  .upgrade-btn{background:white;color:#7C3AED;border:none;border-radius:14px;padding:14px 28px;font-family:'Fredoka One',cursive;font-size:1.05rem;cursor:pointer;width:100%;touch-action:manipulation}
+  .upgrade-btn:active{transform:scale(.96)}
+  .premium-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#FFD166,#FFA500);color:#7A4A00;border-radius:10px;padding:3px 10px;font-size:.72rem;font-weight:800;margin-left:6px}
+
   @media(min-width:480px){.container{padding:24px 24px 130px}.story-box{font-size:1.2rem}.card{padding:28px}}
 
   /* ONBOARDING TOUR */
@@ -368,13 +378,13 @@
 
       <!-- LOG IN TAB -->
       <div class="auth-panel" id="panelLogin">
-        <button class="apple-btn" onclick="loginWithApple()">
-          <svg width="16" height="18" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
-          Continue with Apple
-        </button>
         <button class="google-btn" onclick="loginWithGoogle()">
           <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
           Continue with Google
+        </button>
+        <button class="apple-btn" onclick="loginWithApple()">
+          <svg width="18" height="18" viewBox="0 0 384 512" fill="white"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          Continue with Apple
         </button>
         <div class="auth-divider"><span>or</span></div>
         <input class="setting-input" type="email" id="loginEmail" placeholder="Email address" autocomplete="email" style="margin-bottom:10px" />
@@ -387,13 +397,13 @@
 
       <!-- SIGN UP TAB -->
       <div class="auth-panel" id="panelSignup" style="display:none">
-        <button class="apple-btn" onclick="loginWithApple()">
-          <svg width="16" height="18" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
-          Sign Up with Apple
-        </button>
         <button class="google-btn" onclick="loginWithGoogle()">
           <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
           Sign Up with Google
+        </button>
+        <button class="apple-btn" onclick="loginWithApple()">
+          <svg width="18" height="18" viewBox="0 0 384 512" fill="white"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          Sign Up with Apple
         </button>
         <div class="auth-divider"><span>or</span></div>
         <input class="setting-input" type="email" id="signupEmail" placeholder="Email address" autocomplete="email" style="margin-bottom:10px" />
@@ -557,6 +567,12 @@
       <div class="card-title"><div class="icon icon-purple">📊</div>Parent Dashboard</div>
       <div id="dashboardContent"><div style="text-align:center;color:#ccc;padding:20px">Loading...</div></div>
     </div>
+    <div class="upgrade-card" id="upgradeCard">
+      <h3>⭐ Story Reader Premium</h3>
+      <p>Unlimited stories, full social features, and more!</p>
+      <div class="upgrade-price">$4.99<span>/month</span></div>
+      <button class="upgrade-btn" onclick="startCheckout()">Upgrade Now</button>
+    </div>
     <div class="card">
       <div class="card-title"><div class="icon icon-yellow">✏️</div>Edit Reader</div>
       <div id="editReaderSection">
@@ -611,11 +627,6 @@
       <input class="setting-input" type="password" id="pinInput" placeholder="Enter a new 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" />
       <p style="font-size:.8rem;color:#bbb;font-weight:600;margin-top:6px">Leave blank to keep current PIN.</p>
       <button class="btn btn-sky" onclick="savePin()" style="margin-top:12px">Save PIN</button>
-    </div>
-    <div class="card" style="border:2px solid #FFD9D9">
-      <div class="card-title"><div class="icon icon-coral">⚠️</div>Danger Zone</div>
-      <p style="font-size:.85rem;color:#999;font-weight:600;margin-bottom:12px">Permanently deletes your account, every child profile, all saved stories, reading history, and friend connections. This cannot be undone.</p>
-      <button class="btn btn-ghost" id="deleteAccountBtn" onclick="deleteAccount()" style="color:var(--coral);border:2px solid var(--coral);background:white">🗑️ Delete My Account</button>
     </div>
     <button class="btn btn-ghost" onclick="returnFromSettings()">← Back to App</button>
     <button class="btn btn-ghost" onclick="logOut()" style="margin-top:8px;color:var(--coral)">🚪 Log Out</button>
@@ -705,19 +716,6 @@
       <button class="pin-key" onclick="pinPress('0')">0</button><button class="pin-key" onclick="pinBackspace()">⌫</button>
     </div>
     <button class="btn btn-ghost" onclick="closePinModal()" style="font-size:1rem;padding:14px">Cancel</button>
-  </div>
-</div>
-
-<!-- MATH PARENT GATE MODAL (shown when no PIN has been set yet) -->
-<div class="modal" id="mathGateModal">
-  <div class="modal-card">
-    <h3>🧑‍🎓 Grown-ups Only!</h3>
-    <p>Answer this to prove you're a parent:</p>
-    <p id="mathGateQuestion" style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--ink);margin:-8px 0 16px"></p>
-    <input class="setting-input" type="number" inputmode="numeric" id="mathGateInput" placeholder="Your answer" style="text-align:center;margin-bottom:8px" onkeydown="if(event.key==='Enter')submitMathGate()" />
-    <div class="pin-error-msg" id="mathGateErrorMsg"></div>
-    <button class="btn btn-sky" onclick="submitMathGate()" style="margin-bottom:10px">Continue</button>
-    <button class="btn btn-ghost" onclick="closeMathGate()" style="font-size:1rem;padding:14px">Cancel</button>
   </div>
 </div>
 
@@ -1466,39 +1464,14 @@ function resetReading(){
 // PARENT SETTINGS + DASHBOARD
 // ============================================================
 function openParentGate(){
-  // If no PIN set yet, still require a simple parent gate before granting access
+  // If no PIN set yet, go straight to settings
   if(!parentPin||parentPin===''){
-    openMathGate(openParentSettings);
+    openParentSettings();
     return;
   }
   pinEntry='';updatePinDots();document.getElementById('pinErrorMsg').textContent='';document.getElementById('pinModal').classList.add('show');
 }
 function closePinModal(){document.getElementById('pinModal').classList.remove('show');pinEntry='';updatePinDots();pendingAcceptId=null;document.getElementById('pinErrorMsg').textContent='';}
-
-// Lightweight parent gate (math challenge) used whenever no PIN has been configured yet.
-let mathGateAnswer=null,mathGateCallback=null;
-function openMathGate(callback){
-  const a=Math.floor(Math.random()*8)+2,b=Math.floor(Math.random()*8)+2;
-  mathGateAnswer=a*b;mathGateCallback=callback;
-  document.getElementById('mathGateQuestion').textContent=`What is ${a} × ${b}?`;
-  document.getElementById('mathGateInput').value='';
-  document.getElementById('mathGateErrorMsg').textContent='';
-  document.getElementById('mathGateModal').classList.add('show');
-  setTimeout(()=>{const el=document.getElementById('mathGateInput');if(el)el.focus();},100);
-}
-function closeMathGate(){document.getElementById('mathGateModal').classList.remove('show');mathGateAnswer=null;mathGateCallback=null;}
-function submitMathGate(){
-  const input=document.getElementById('mathGateInput');
-  const val=parseInt(input.value,10);
-  if(!isNaN(val)&&val===mathGateAnswer){
-    const cb=mathGateCallback;
-    closeMathGate();
-    if(cb)cb();
-  }else{
-    document.getElementById('mathGateErrorMsg').textContent='Not quite — try again!';
-    input.value='';input.focus();
-  }
-}
 function pinPress(digit){
   if(pinEntry.length>=4)return;pinEntry+=digit;updatePinDots();
   if(pinEntry.length===4){
@@ -1924,34 +1897,6 @@ async function logOut(){
   showLoginScreen();
 }
 
-async function deleteAccount(){
-  if(!confirm('This will PERMANENTLY delete your account, every child profile, all saved stories, reading history, and friend connections. This cannot be undone.\n\nAre you sure you want to continue?'))return;
-  if(!confirm('Last check: this is permanent and cannot be reversed. Delete your account now?'))return;
-  const btn=document.getElementById('deleteAccountBtn');
-  const orig=btn.innerHTML;
-  btn.innerHTML='<span class="spinner"></span>Deleting...';btn.disabled=true;
-  try{
-    const {data:{session}}=await supaAuth.auth.getSession();
-    if(!session){alert('You need to be logged in to delete your account.');btn.innerHTML=orig;btn.disabled=false;return;}
-    const res=await fetch(SUPA_URL+'/functions/v1/delete-account',{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'}
-    });
-    let result={};
-    try{result=await res.json();}catch(e){}
-    if(!res.ok||result.error)throw new Error(result.error||('Server error ('+res.status+')'));
-    try{localStorage.removeItem('sr_family_code');}catch(e){}
-    try{if(familyId)localStorage.removeItem('sr_pin_'+familyId);}catch(e){}
-    familyId=null;currentChild=null;childStats=null;childHistory=[];allChildren=[];
-    alert('Your account and all associated data have been permanently deleted.');
-    try{await supaAuth.auth.signOut();}catch(e){}
-    location.reload();
-  }catch(e){
-    alert('Could not delete your account: '+e.message+'. Please try again, or contact support if this keeps happening.');
-    btn.innerHTML=orig;btn.disabled=false;
-  }
-}
-
 // ============================================================
 // FIRST TIME SETUP
 // ============================================================
@@ -2285,8 +2230,10 @@ function acceptFriend(friendId){
     document.getElementById('pinErrorMsg').textContent='Parent PIN required to accept friend requests';
     document.getElementById('pinModal').classList.add('show');
   } else {
-    // No PIN set yet - still require the parent gate before accepting
-    openMathGate(()=>doAcceptFriend(friendId));
+    // No PIN set - accept directly but show warning
+    if(confirm('No parent PIN is set. Accept this friend request?')){
+      doAcceptFriend(friendId);
+    }
   }
 }
 
@@ -2458,6 +2405,59 @@ function checkBrowser(){
 }
 
 // ============================================================
+// STRIPE CHECKOUT
+// ============================================================
+const STRIPE_WORKER_URL = 'https://story-reader-stripe.steve-jaffe.workers.dev';
+const STRIPE_PRICE_ID = 'price_1UEd7WEPwujBXNMZVASM7W8P';
+
+async function startCheckout(){
+  const btn=document.querySelector('#upgradeCard .upgrade-btn');
+  const orig=btn.textContent;
+  btn.textContent='Loading...';btn.disabled=true;
+  try{
+    // Get current user email
+    const {data:{session}}=await supaAuth.auth.getSession();
+    const email=session&&session.user?session.user.email:null;
+    if(!email){alert('Please log in again to upgrade');btn.textContent=orig;btn.disabled=false;return;}
+
+    const res=await fetch(STRIPE_WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        priceId:STRIPE_PRICE_ID,
+        customerEmail:email,
+        successUrl:'https://storyreader.app?checkout=success',
+        cancelUrl:'https://storyreader.app?checkout=cancel'
+      })
+    });
+    const rawText=await res.text();
+    console.log('Worker response status:',res.status);
+    console.log('Worker response body:',rawText);
+    const data=JSON.parse(rawText);
+    if(data.url){
+      window.location.href=data.url;
+    } else {
+      throw new Error(data.error||'Could not start checkout');
+    }
+  }catch(e){
+    console.error('Checkout error:',e);
+    alert('Could not start checkout - please try again');
+    btn.textContent=orig;btn.disabled=false;
+  }
+}
+
+function checkCheckoutRedirect(){
+  const params=new URLSearchParams(window.location.search);
+  const status=params.get('checkout');
+  if(status==='success'){
+    setTimeout(()=>alert('🎉 Welcome to Premium! Your subscription is now active.'),1000);
+    window.history.replaceState(null,'',window.location.pathname);
+  } else if(status==='cancel'){
+    window.history.replaceState(null,'',window.location.pathname);
+  }
+}
+
+// ============================================================
 // INIT
 // ============================================================
 function initStars(){const c=document.getElementById('starsContainer');for(let i=0;i<18;i++){const s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;font-size:${.6+Math.random()*.7}rem`;c.appendChild(s);}}
@@ -2477,6 +2477,7 @@ document.querySelector('.stars').style.display='none';
 checkBrowser();
 initStars();
 checkLogin();
+checkCheckoutRedirect();
 </script>
 </body>
 </html>
