@@ -88,6 +88,9 @@
   .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:#ccc;font-size:.82rem;font-weight:700}
   .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:#eee}
   .link-btn{background:none;border:none;color:var(--purple);font-weight:800;font-size:inherit;cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:underline;padding:0}
+  .password-wrap{position:relative}
+  .password-wrap input{padding-right:46px!important}
+  .password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.2rem;padding:6px;color:#aaa;touch-action:manipulation}
 
   /* CHILD PICKER */
   .child-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:8px}
@@ -388,7 +391,10 @@
         </button>
         <div class="auth-divider"><span>or</span></div>
         <input class="setting-input" type="email" id="loginEmail" placeholder="Email address" autocomplete="email" style="margin-bottom:10px" />
-        <input class="setting-input" type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" style="margin-bottom:6px" onkeydown="if(event.key==='Enter')submitEmailLogin()" />
+        <div class="password-wrap" style="margin-bottom:6px">
+          <input class="setting-input" type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitEmailLogin()" />
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('loginPassword',this)">👁️</button>
+        </div>
         <div style="text-align:right;margin-bottom:14px"><button class="link-btn" onclick="showForgotPassword()">Forgot password?</button></div>
         <div class="login-error" id="loginError"></div>
         <button class="btn btn-purple" onclick="submitEmailLogin()" style="width:100%">Log In</button>
@@ -407,7 +413,10 @@
         </button>
         <div class="auth-divider"><span>or</span></div>
         <input class="setting-input" type="email" id="signupEmail" placeholder="Email address" autocomplete="email" style="margin-bottom:10px" />
-        <input class="setting-input" type="password" id="signupPassword" placeholder="Password (min 6 characters)" autocomplete="new-password" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')submitEmailSignup()" />
+        <div class="password-wrap" style="margin-bottom:10px">
+          <input class="setting-input" type="password" id="signupPassword" placeholder="Password (min 6 characters)" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitEmailSignup()" />
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signupPassword',this)">👁️</button>
+        </div>
         <div class="login-error" id="signupError"></div>
         <button class="btn btn-purple" onclick="submitEmailSignup()" style="width:100%">Create Account</button>
       </div>
@@ -2449,6 +2458,12 @@ function checkCheckoutRedirect(){
   } else if(status==='cancel'){
     window.history.replaceState(null,'',window.location.pathname);
   }
+}
+
+function togglePasswordVisibility(id,btn){
+  const input=document.getElementById(id);
+  if(input.type==='password'){input.type='text';btn.textContent='🙈';}
+  else{input.type='password';btn.textContent='👁️';}
 }
 
 // ============================================================
