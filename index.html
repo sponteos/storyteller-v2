@@ -600,6 +600,12 @@
       <div class="card-title"><div class="icon icon-purple">📊</div>Parent Dashboard</div>
       <div id="dashboardContent"><div style="text-align:center;color:#ccc;padding:20px">Loading...</div></div>
     </div>
+    <div class="upgrade-card" id="upgradeCard">
+      <h3>⭐ Story Reader Premium</h3>
+      <p>Unlimited stories, full social features, and more!</p>
+      <div class="upgrade-price">$4.99<span>/month</span></div>
+      <button class="upgrade-btn" onclick="startCheckout()">Upgrade Now</button>
+    </div>
     <div class="card">
       <div class="card-title"><div class="icon icon-yellow">✏️</div>Edit Reader</div>
       <div id="editReaderSection">
@@ -2434,7 +2440,7 @@ function checkBrowser(){
 // ============================================================
 // STRIPE CHECKOUT
 // ============================================================
-const STRIPE_WORKER_URL = 'https://story-reader-stripe.steve-jaffe.workers.dev';
+const STRIPE_WORKER_URL = 'https://story-reader-stripe-v2.steve-jaffe.workers.dev';
 const STRIPE_PRICE_ID = 'price_1UEd7WEPwujBXNMZVASM7W8P';
 
 async function startCheckout(){
